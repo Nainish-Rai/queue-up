@@ -12,11 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2, CheckCircle2 } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
 
 interface CreateWaitlistDialogProps {
   trigger?: React.ReactNode;
@@ -38,6 +37,7 @@ export function CreateWaitlistDialog({ trigger }: CreateWaitlistDialogProps) {
       setSlug("");
     } catch (error) {
       // Error handling is done in the mutation
+      console.error("Error creating waitlist:", error);
     }
   };
 
@@ -59,123 +59,120 @@ export function CreateWaitlistDialog({ trigger }: CreateWaitlistDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+
+      <DialogContent className="sm:max-w-[500px] p-0 border bg-background/90 backdrop-blur-lg rounded-3xl overflow-hidden shadow-none">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
+          className="relative rounded-2xl shadow-2xl overflow-hidden"
+          // initial={{ opacity: 0, scale: 0.95 }}
+          // animate={{ opacity: 1, scale: 1 }}
+          // exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3 }}
         >
-          <form onSubmit={handleSubmit}>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <Plus className="w-5 h-5 text-primary" />
-                </motion.div>
-                Create New Waitlist
-              </DialogTitle>
-              <DialogDescription>
-                Create a new waitlist for your product or service.
-              </DialogDescription>
-            </DialogHeader>
+          <div className="absolute inset-0 " />
 
-            <motion.div
-              className="grid gap-4 py-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={handleNameChange}
-                  className="col-span-3"
-                  placeholder="My Awesome Product"
-                  required
-                  disabled={createWaitlistMutation.isPending}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="slug" className="text-right">
-                  Slug
-                </Label>
-                <Input
-                  id="slug"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  className="col-span-3"
-                  placeholder="my-awesome-product"
-                  pattern="^[a-z0-9-]+$"
-                  title="Lowercase letters, numbers and hyphens only"
-                  required
-                  disabled={createWaitlistMutation.isPending}
-                />
-              </div>
+          <div className="relative p-8">
+            <form onSubmit={handleSubmit}>
+              <DialogHeader className="mb-6">
+                <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
+                  Create New Waitlist
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground mt-2">
+                  Create a new waitlist for your product or service.
+                </DialogDescription>
+              </DialogHeader>
 
-              <AnimatePresence>
-                {createWaitlistMutation.error && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="bg-red-50 border border-red-200 p-3 rounded-lg text-red-600 text-sm"
-                  >
-                    {createWaitlistMutation.error.message ||
-                      "Failed to create waitlist"}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="name" className="font-medium">
+                    Waitlist Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={handleNameChange}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 focus:border-white/40"
+                    placeholder="My Awesome Product"
+                    required
+                    disabled={createWaitlistMutation.isPending}
+                  />
+                </div>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={createWaitlistMutation.isPending}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={createWaitlistMutation.isPending}
-                className="min-w-[100px]"
-              >
-                <AnimatePresence mode="wait">
-                  {createWaitlistMutation.isPending ? (
+                <div className="space-y-3">
+                  <Label htmlFor="slug" className="font-medium">
+                    URL Slug
+                  </Label>
+                  <Input
+                    id="slug"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 focus:border-white/40"
+                    placeholder="my-awesome-product"
+                    pattern="^[a-z0-9-]+$"
+                    title="Lowercase letters, numbers and hyphens only"
+                    required
+                    disabled={createWaitlistMutation.isPending}
+                  />
+                </div>
+
+                <AnimatePresence>
+                  {createWaitlistMutation.error && (
                     <motion.div
-                      key="loading"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 p-4 rounded-lg text-red-600 text-sm"
                     >
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Creating...
+                      {createWaitlistMutation.error.message ||
+                        "Failed to create waitlist"}
                     </motion.div>
-                  ) : (
-                    <motion.span
-                      key="create"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      Create
-                    </motion.span>
                   )}
                 </AnimatePresence>
-              </Button>
-            </DialogFooter>
-          </form>
+              </div>
+
+              <DialogFooter className="mt-8 gap-3">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setIsOpen(false)}
+                  disabled={createWaitlistMutation.isPending}
+                  className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createWaitlistMutation.isPending}
+                  className="min-w-[120px] "
+                >
+                  <AnimatePresence mode="wait">
+                    {createWaitlistMutation.isPending ? (
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex items-center  gap-2"
+                      >
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Creating...
+                      </motion.div>
+                    ) : (
+                      <motion.span
+                        key="create"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Create
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </DialogFooter>
+            </form>
+          </div>
         </motion.div>
       </DialogContent>
     </Dialog>

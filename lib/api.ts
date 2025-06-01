@@ -91,7 +91,9 @@ export async function getUserWaitlists(
     throw new Error(error.error || "Failed to fetch waitlists");
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log("waitlists data", data);
+  return data;
 }
 
 // Create a new waitlist for the authenticated user

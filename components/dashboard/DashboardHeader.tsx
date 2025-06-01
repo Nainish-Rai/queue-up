@@ -72,7 +72,7 @@ export function DashboardHeader({ session }: DashboardHeaderProps) {
   const breadcrumbs = getBreadcrumbs();
 
   return (
-    <header className="bg-background border-b sticky top-0 z-30 lg:pl-0 pl-16">
+    <header className="bg-background/80 backdrop-blur-md border-b sticky top-0 z-30 lg:pl-0 pl-16">
       <div className="flex items-center justify-between h-16 px-4 lg:px-8">
         <div className="flex items-center space-x-2">
           <nav className="flex items-center space-x-1 text-sm">
