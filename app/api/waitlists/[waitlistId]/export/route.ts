@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -72,7 +73,7 @@ export async function GET(
       "Referral ID",
     ];
 
-    const csvRows = signupsWithReferralData.map((signup) => [
+    const csvRows = signupsWithReferralData.map((signup: any) => [
       `"${signup.name}"`,
       `"${signup.email}"`,
       signup.referralCount.toString(),
@@ -83,7 +84,7 @@ export async function GET(
 
     const csvContent = [
       csvHeaders.join(","),
-      ...csvRows.map((row) => row.join(",")),
+      ...csvRows.map((row: any) => row.join(",")),
     ].join("\n");
 
     return new NextResponse(csvContent, {
