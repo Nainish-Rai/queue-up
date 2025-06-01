@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getUserWaitlists } from "@/lib/api";
-import { auth } from "@/lib/auth";
-import { UserProfile } from "@/app/components/auth/UserProfile";
-import { redirect } from "next/navigation";
 import { WaitlistCard } from "../components/waitlist/WaitlistCard";
 import { CreateWaitlistDialog } from "../components/waitlist/CreateWaitlistDialog";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,7 +50,7 @@ async function WaitlistsGrid() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       {waitlists.map((waitlist: any) => (
         <WaitlistCard key={waitlist.id} waitlist={waitlist} />
       ))}
@@ -63,63 +59,38 @@ async function WaitlistsGrid() {
 }
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login?callbackUrl=/dashboard");
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
             <p className="text-muted-foreground mt-1">
               Manage your waitlists and track signups
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <div className="hidden sm:block">
-              <CreateWaitlistDialog />
-            </div>
+          <div className="sm:hidden">
+            <CreateWaitlistDialog />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-card rounded-xl border shadow-sm p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-semibold">Your Waitlists</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage and monitor your active waitlists
+            </p>
+          </div>
+          <div className="hidden sm:block">
+            <CreateWaitlistDialog />
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* User Profile Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <UserProfile initialSession={session} />
-            </div>
-          </div>
-
-          {/* Waitlists Section */}
-          <div className="lg:col-span-3">
-            <div className="bg-card rounded-xl border shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-semibold">Your Waitlists</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Manage and monitor your active waitlists
-                  </p>
-                </div>
-                <div className="sm:hidden">
-                  <CreateWaitlistDialog />
-                </div>
-              </div>
-
-              <Suspense fallback={<WaitlistsSkeleton />}>
-                <WaitlistsGrid />
-              </Suspense>
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={<WaitlistsSkeleton />}>
+          <WaitlistsGrid />
+        </Suspense>
       </div>
     </div>
   );

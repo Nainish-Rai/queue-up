@@ -4,9 +4,18 @@ import { useSession } from "@/lib/auth-client";
 import { SignOutButton } from "./SignOutButton";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, Mail, ChevronDown } from "lucide-react";
 
 type SessionType = {
   user: {
@@ -17,11 +26,15 @@ type SessionType = {
   };
 } | null;
 
+interface UserProfileProps {
+  initialSession?: SessionType;
+  variant?: "default" | "navbar";
+}
+
 export function UserProfile({
   initialSession = null,
-}: {
-  initialSession?: SessionType;
-}) {
+  variant = "default",
+}: UserProfileProps) {
   const { data: clientSession, isPending } = useSession();
   const [session, setSession] = useState<SessionType>(initialSession);
 
@@ -32,6 +45,20 @@ export function UserProfile({
   }, [clientSession]);
 
   if (typeof window === "undefined") {
+    if (variant === "navbar") {
+      return initialSession ? (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <User className="w-4 h-4 text-primary" />
+          </div>
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        </div>
+      ) : (
+        <Button variant="ghost" size="sm">
+          Sign in
+        </Button>
+      );
+    }
     return initialSession ? (
       <Card className="w-full">
         <CardHeader className="pb-3">
@@ -71,6 +98,14 @@ export function UserProfile({
   }
 
   if (isPending && !session) {
+    if (variant === "navbar") {
+      return (
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-8 h-8 rounded-full" />
+          <Skeleton className="w-4 h-4" />
+        </div>
+      );
+    }
     return (
       <Card className="w-full">
         <CardHeader className="pb-3">
@@ -90,12 +125,68 @@ export function UserProfile({
   }
 
   if (!session) {
+    if (variant === "navbar") {
+      return (
+        <Button variant="ghost" size="sm">
+          Sign in
+        </Button>
+      );
+    }
     return (
       <Card>
         <CardContent className="p-6 text-center text-sm text-muted-foreground">
           Not signed in
         </CardContent>
       </Card>
+    );
+  }
+
+  if (variant === "navbar") {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-auto px-2 hover:bg-muted/50">
+            <div className="flex items-center gap-2">
+              {session.user.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || "User"}
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="w-3 h-3 text-primary" />
+                </div>
+              )}
+              <span className="text-sm font-medium max-w-[100px] truncate">
+                {session.user.name || "User"}
+              </span>
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {session.user.name || "User"}
+              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Mail className="w-3 h-3" />
+                <span className="truncate">{session.user.email}</span>
+              </div>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <div className="w-full">
+              <SignOutButton className="w-full justify-start h-auto p-2 border-0 bg-transparent hover:bg-accent text-left font-normal" />
+            </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 

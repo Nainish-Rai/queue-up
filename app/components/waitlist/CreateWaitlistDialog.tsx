@@ -17,7 +17,11 @@ import { useState } from "react";
 import { createWaitlist } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
-export function CreateWaitlistDialog() {
+interface CreateWaitlistDialogProps {
+  trigger?: React.ReactNode;
+}
+
+export function CreateWaitlistDialog({ trigger }: CreateWaitlistDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +38,7 @@ export function CreateWaitlistDialog() {
     try {
       await createWaitlist({ name, slug });
       setIsOpen(false);
-      router.refresh(); // Refresh the page to show the new waitlist
+      router.refresh();
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to create waitlist");
     } finally {
@@ -42,11 +46,9 @@ export function CreateWaitlistDialog() {
     }
   };
 
-  // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setName(newName);
-    // Only auto-update slug if user hasn't manually edited it
     if (!slug || slug === name.toLowerCase().replace(/\s+/g, "-")) {
       setSlug(newName.toLowerCase().replace(/\s+/g, "-"));
     }
@@ -55,9 +57,11 @@ export function CreateWaitlistDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-1">
-          <Plus size={16} /> Create Waitlist
-        </Button>
+        {trigger || (
+          <Button className="flex items-center gap-1">
+            <Plus size={16} /> Create Waitlist
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
