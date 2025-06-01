@@ -65,9 +65,8 @@ export function getBaseUrl() {
   const host =
     process.env.NEXT_PUBLIC_VERCEL_URL ||
     process.env.NEXT_PUBLIC_HOST ||
-    "localhost:3000";
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  return `${protocol}://${host}`;
+    "http://localhost:3000"; // Updated to remove the extra http://
+  return host;
 }
 
 // Fetch waitlists for the authenticated user
