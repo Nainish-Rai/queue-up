@@ -9,121 +9,44 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  name              String?
-  gmailAccessToken  String? // OAuth token for Gmail API
-  gmailRefreshToken String? // Refresh token for Gmail API
-  tokenExpiresAt    DateTime? // Token expiration timestamp
-  profilePicture    String?
-
-  // Relationships
-  emails          Email[]
-  labels          Label[]
-  preference      UserPreference?
-  processingStats ProcessingStats[]
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String?
+  waitlists     Waitlist[]
   emailVerified Boolean
   image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
 
   @@map("user")
 }
 
-model Email {
-  id            String   @id @default(uuid())
-  gmailId       String   @unique // Gmail API message ID
-  subject       String?
-  snippet       String? // Short preview (not full content for privacy)
-  sender        String
-  receivedAt    DateTime
-  isRead        Boolean  @default(false)
-  isPrioritized Boolean  @default(false) // Part of Top 20
-
-  // Relationships
-  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  labels EmailLabel[]
-
+model Waitlist {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  signups   Signup[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, receivedAt])
 }
 
-model Label {
-  id           String  @id @default(uuid())
-  name         String
-  color        String?
-  gmailLabelId String? // ID of the corresponding Gmail label
-  description  String?
-  isDefault    Boolean @default(false)
-
-  // Relationships
-  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  emails EmailLabel[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, name])
-}
-
-model EmailLabel {
-  email   Email    @relation(fields: [emailId], references: [id], onDelete: Cascade)
-  emailId String
-  label   Label    @relation(fields: [labelId], references: [id], onDelete: Cascade)
-  labelId String
-  addedAt DateTime @default(now())
-
-  @@id([emailId, labelId])
-}
-
-model UserPreference {
-  id                  String  @id @default(uuid())
-  customPrompt        String? // Classification instructions
-  prioritySenders     String? // JSON array of important senders
-  ignoredSenders      String? // JSON array of senders to ignore
-  contentKeywords     String? // JSON array of important keywords
-  processingFrequency String  @default("HOURLY") // HOURLY, DAILY, CUSTOM
-  processingSchedule  String? // JSON format for custom scheduling
-
-  // Relationships
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ProcessingStats {
-  id              String    @id @default(uuid())
-  batchId         String    @unique // Processing batch identifier
-  startTime       DateTime
-  endTime         DateTime?
-  emailsProcessed Int       @default(0)
-  successCount    Int       @default(0)
-  errorCount      Int       @default(0)
-  tokensUsed      Int       @default(0) // API usage tracking
-  status          String // PENDING, PROCESSING, COMPLETED, FAILED
-
-  // Relationships
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, startTime])
+model Signup {
+  id         String   @id @default(cuid())
+  email      String
+  name       String?
+  waitlistId String
+  waitlist   Waitlist @relation(fields: [waitlistId], references: [id])
+  referredBy String?
+  referralId String   @unique
+  createdAt  DateTime @default(now())
 }
 
 model Session {
