@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   LayoutDashboard,
@@ -14,32 +13,17 @@ import {
   X,
   Settings,
   BarChart3,
+  ChevronDown,
 } from "lucide-react";
 import { CreateWaitlistDialog } from "@/app/components/waitlist/CreateWaitlistDialog";
-
-interface Waitlist {
-  id: string;
-  name: string;
-  signupCount: number;
-}
+import { useWaitlists } from "@/app/providers/WaitlistProvider";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function DashboardNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const [waitlists, setWaitlists] = useState<Waitlist[]>([]);
+  const [expandedWaitlist, setExpandedWaitlist] = useState<string | null>(null);
+  const { waitlists, isLoading } = useWaitlists();
   const pathname = usePathname();
-
-  useEffect(() => {
-    const fetchWaitlists = async () => {
-      try {
-        const data = await fetch("/api/waitlists").then((res) => res.json());
-        setWaitlists(data);
-      } catch (error) {
-        console.error("Failed to fetch waitlists:", error);
-      }
-    };
-
-    fetchWaitlists();
-  }, []);
 
   const isActiveRoute = (route: string) => {
     if (route === "/dashboard" && pathname === "/dashboard") return true;
@@ -48,6 +32,14 @@ export function DashboardNav() {
   };
 
   const currentWaitlistId = pathname.split("/")[2];
+
+  const toggleWaitlist = (waitlistId: string) => {
+    setExpandedWaitlist(expandedWaitlist === waitlistId ? null : waitlistId);
+  };
+
+  const isWaitlistExpanded = (waitlistId: string) => {
+    return expandedWaitlist === waitlistId || currentWaitlistId === waitlistId;
+  };
 
   return (
     <>
@@ -60,15 +52,20 @@ export function DashboardNav() {
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </Button>
 
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-full bg-card border-r transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-40 w-64 h-full bg-card border-r transition-transform duration-300 lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -82,7 +79,7 @@ export function DashboardNav() {
             </Link>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <Link
               href="/dashboard"
               className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
@@ -112,7 +109,11 @@ export function DashboardNav() {
                 />
               </div>
 
-              {waitlists.length === 0 ? (
+              {isLoading ? (
+                <div className="px-3 py-2 text-sm text-muted-foreground">
+                  Loading...
+                </div>
+              ) : waitlists.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-muted-foreground">
                   No waitlists yet
                 </div>
@@ -120,50 +121,65 @@ export function DashboardNav() {
                 <div className="space-y-1">
                   {waitlists.map((waitlist) => (
                     <div key={waitlist.id} className="space-y-1">
-                      <Link
-                        href={`/dashboard/${waitlist.id}`}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                          pathname === `/dashboard/${waitlist.id}`
+                      <div
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer group ${
+                          pathname.startsWith(`/dashboard/${waitlist.id}`)
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-accent"
                         }`}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => toggleWaitlist(waitlist.id)}
                       >
                         <List className="w-4 h-4" />
                         <span className="truncate flex-1">{waitlist.name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {waitlist.signupCount || 0}
-                        </Badge>
-                      </Link>
+                        <motion.div
+                          animate={{
+                            rotate: isWaitlistExpanded(waitlist.id) ? 180 : 0,
+                          }}
+                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </motion.div>
+                      </div>
 
-                      {currentWaitlistId === waitlist.id && (
-                        <div className="ml-6 space-y-1">
-                          <Link
-                            href={`/dashboard/${waitlist.id}`}
-                            className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                              pathname === `/dashboard/${waitlist.id}`
-                                ? "bg-accent text-accent-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                            }`}
-                            onClick={() => setIsOpen(false)}
+                      <AnimatePresence>
+                        {isWaitlistExpanded(waitlist.id) && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                            className="overflow-hidden"
                           >
-                            <BarChart3 className="w-3 h-3" />
-                            <span>Analytics</span>
-                          </Link>
-                          <Link
-                            href={`/dashboard/${waitlist.id}/settings`}
-                            className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                              pathname === `/dashboard/${waitlist.id}/settings`
-                                ? "bg-accent text-accent-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                            }`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            <Settings className="w-3 h-3" />
-                            <span>Settings</span>
-                          </Link>
-                        </div>
-                      )}
+                            <div className="ml-6 space-y-1 py-1">
+                              <Link
+                                href={`/dashboard/${waitlist.id}`}
+                                className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                                  pathname === `/dashboard/${waitlist.id}`
+                                    ? "bg-accent text-accent-foreground"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                <BarChart3 className="w-3 h-3" />
+                                <span>Analytics</span>
+                              </Link>
+                              <Link
+                                href={`/dashboard/${waitlist.id}/settings`}
+                                className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                                  pathname ===
+                                  `/dashboard/${waitlist.id}/settings`
+                                    ? "bg-accent text-accent-foreground"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                <Settings className="w-3 h-3" />
+                                <span>Settings</span>
+                              </Link>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   ))}
                 </div>
