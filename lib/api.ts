@@ -33,6 +33,32 @@ export type SignupResult = {
   position?: number;
 };
 
+export type WaitlistSignup = {
+  id: string;
+  email: string;
+  name?: string;
+  referralId?: string;
+  referredBy?: string;
+  createdAt: Date;
+  referralCount: number;
+  referrerName?: string;
+};
+
+export type WaitlistOverview = {
+  id: string;
+  name: string;
+  slug: string;
+  signupCount: number;
+  createdAt: Date;
+  signups: WaitlistSignup[];
+  topReferrers: Array<{
+    referralId: string;
+    name?: string;
+    email: string;
+    referralCount: number;
+  }>;
+};
+
 // Helper function to get the base URL
 export function getBaseUrl() {
   // Use environment variables to determine the base URL consistently between client and server
@@ -157,4 +183,59 @@ export async function createSignup(data: SignupData): Promise<SignupResult> {
       message: "Failed to join waitlist. Please try again.",
     };
   }
+}
+
+export async function getWaitlistOverview(
+  waitlistId: string,
+  serverHeaders?: Headers
+): Promise<WaitlistOverview> {
+  const baseUrl = getBaseUrl();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (serverHeaders && serverHeaders.has("cookie")) {
+    headers["cookie"] = serverHeaders.get("cookie") as string;
+  }
+
+  const response = await fetch(`${baseUrl}/api/waitlists/${waitlistId}`, {
+    method: "GET",
+    headers,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to fetch waitlist overview");
+  }
+
+  return response.json();
+}
+
+export async function exportWaitlistSignups(
+  waitlistId: string,
+  serverHeaders?: Headers
+): Promise<Blob> {
+  const baseUrl = getBaseUrl();
+  const headers: Record<string, string> = {};
+
+  if (serverHeaders && serverHeaders.has("cookie")) {
+    headers["cookie"] = serverHeaders.get("cookie") as string;
+  }
+
+  const response = await fetch(
+    `${baseUrl}/api/waitlists/${waitlistId}/export`,
+    {
+      method: "GET",
+      headers,
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to export signups");
+  }
+
+  return response.blob();
 }

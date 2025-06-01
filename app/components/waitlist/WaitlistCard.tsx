@@ -52,7 +52,7 @@ export function WaitlistCard({ waitlist }: WaitlistCardProps) {
       <CardFooter className="pt-3 border-t bg-muted/30">
         <div className="flex w-full gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link href={`/dashboard/waitlists/${waitlist.id}`}>
+            <Link href={`/dashboard/${waitlist.id}`}>
               <Settings className="w-4 h-4 mr-2" />
               Manage
             </Link>
