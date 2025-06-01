@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import type { Waitlist } from "@prisma/client";
+import type { Waitlist } from "@/lib/api";
 import { ExternalLink, Settings, Calendar, Hash } from "lucide-react";
 import Link from "next/link";
 
