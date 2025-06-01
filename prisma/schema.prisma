@@ -45,7 +45,7 @@ model Signup {
   waitlistId String
   waitlist   Waitlist @relation(fields: [waitlistId], references: [id])
   referredBy String?
-  referralId String   @unique
+  referralId String?  @unique
   createdAt  DateTime @default(now())
 }
 
