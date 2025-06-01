@@ -37,7 +37,8 @@ export async function GET(
     }
 
     const signupsWithReferralCount = await Promise.all(
-      waitlist.signups.map(async (signup) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      waitlist.signups.map(async (signup: any) => {
         const referralCount = await prisma.signup.count({
           where: { referredBy: signup.referralId },
         });

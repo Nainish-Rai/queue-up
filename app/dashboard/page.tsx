@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getUserWaitlists } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { UserProfile } from "@/app/components/auth/UserProfile";
@@ -53,7 +54,7 @@ async function WaitlistsGrid() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {waitlists.map((waitlist) => (
+      {waitlists.map((waitlist: any) => (
         <WaitlistCard key={waitlist.id} waitlist={waitlist} />
       ))}
     </div>
