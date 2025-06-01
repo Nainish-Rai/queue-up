@@ -1,5 +1,5 @@
 import { getWaitlistBySlug } from "@/lib/api";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Users, Calendar, ExternalLink, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import { SignupForm } from "@/app/components/waitlist/SignupForm";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface WaitlistPageProps {
   params: Promise<{
@@ -21,6 +23,14 @@ export default async function WaitlistPage({
   params,
   searchParams,
 }: WaitlistPageProps) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const { slug } = await params;
   const { ref } = await searchParams;
 
@@ -30,6 +40,10 @@ export default async function WaitlistPage({
   } catch (error: unknown) {
     console.error("Error fetching waitlist:", error);
     notFound();
+  }
+
+  if (waitlist.ownerId !== session.user.id) {
+    redirect("/dashboard");
   }
 
   return (
