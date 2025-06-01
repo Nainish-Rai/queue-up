@@ -1,11 +1,11 @@
 "use client";
 
-import { WaitlistCard } from "../components/waitlist/WaitlistCard";
-import { CreateWaitlistDialog } from "../components/waitlist/CreateWaitlistDialog";
+import { CreateWaitlistDialog } from "../../components/waitlist/CreateWaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { List, Sparkles } from "lucide-react";
 import { useWaitlists } from "../providers/WaitlistProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import TiltedCard from "@/components/tilted-card";
 
 function WaitlistsSkeleton() {
   return (
@@ -13,18 +13,12 @@ function WaitlistsSkeleton() {
       {[...Array(3)].map((_, i) => (
         <motion.div
           key={i}
-          className="p-6 rounded-lg border bg-card"
+          className="aspect-[4/5] rounded-lg border bg-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
         >
-          <Skeleton className="h-6 w-48 mb-3" />
-          <Skeleton className="h-4 w-32 mb-2" />
-          <Skeleton className="h-4 w-40 mb-4" />
-          <div className="flex justify-between">
-            <Skeleton className="h-9 w-20" />
-            <Skeleton className="h-9 w-24" />
-          </div>
+          <Skeleton className="w-full h-full rounded-lg" />
         </motion.div>
       ))}
     </div>
@@ -93,7 +87,19 @@ function WaitlistsGrid() {
     >
       <AnimatePresence mode="popLayout">
         {waitlists.map((waitlist, index) => (
-          <WaitlistCard key={waitlist.id} waitlist={waitlist} index={index} />
+          <TiltedCard
+            key={waitlist.id}
+            waitlist={waitlist}
+            index={index}
+            containerHeight="320px"
+            containerWidth="100%"
+            imageHeight="320px"
+            imageWidth="100%"
+            rotateAmplitude={12}
+            scaleOnHover={1.05}
+            showMobileWarning={false}
+            showTooltip={false}
+          />
         ))}
       </AnimatePresence>
     </motion.div>

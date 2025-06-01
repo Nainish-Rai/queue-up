@@ -15,7 +15,7 @@ import {
   BarChart3,
   ChevronDown,
 } from "lucide-react";
-import { CreateWaitlistDialog } from "@/app/components/waitlist/CreateWaitlistDialog";
+import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
 import { motion, AnimatePresence } from "framer-motion";
 

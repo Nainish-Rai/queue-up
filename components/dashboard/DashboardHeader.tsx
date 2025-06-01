@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { UserProfile } from "@/app/components/auth/UserProfile";
+import { UserProfile } from "@/components/auth/UserProfile";
 import { ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 

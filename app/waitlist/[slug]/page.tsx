@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Users, Calendar, ExternalLink, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
-import { SignupForm } from "@/app/components/waitlist/SignupForm";
+import { SignupForm } from "@/components/waitlist/SignupForm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
