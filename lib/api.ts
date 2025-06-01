@@ -1,90 +1,87 @@
-import { prisma } from "../lib/prisma";
-import type { User, Post, Prisma } from "@prisma/client";
-
-export const api = {
-  // User operations
-  async getUsers() {
-    return prisma.user.findMany({
-      include: {
-        posts: true,
-      },
-    });
-  },
-
-  async getUserById(id: number) {
-    return prisma.user.findUnique({
-      where: { id },
-      include: {
-        posts: true,
-      },
-    });
-  },
-
-  async createUser(data: Prisma.UserCreateInput) {
-    return prisma.user.create({
-      data,
-      include: {
-        posts: true,
-      },
-    });
-  },
-
-  async updateUser(id: number, data: Prisma.UserUpdateInput) {
-    return prisma.user.update({
-      where: { id },
-      data,
-      include: {
-        posts: true,
-      },
-    });
-  },
-
-  async deleteUser(id: number) {
-    return prisma.user.delete({
-      where: { id },
-    });
-  },
-
-  // Post operations
-  async getPosts() {
-    return prisma.post.findMany({
-      include: {
-        author: true,
-      },
-    });
-  },
-
-  async getPostById(id: number) {
-    return prisma.post.findUnique({
-      where: { id },
-      include: {
-        author: true,
-      },
-    });
-  },
-
-  async createPost(data: Prisma.PostCreateInput) {
-    return prisma.post.create({
-      data,
-      include: {
-        author: true,
-      },
-    });
-  },
-
-  async updatePost(id: number, data: Prisma.PostUpdateInput) {
-    return prisma.post.update({
-      where: { id },
-      data,
-      include: {
-        author: true,
-      },
-    });
-  },
-
-  async deletePost(id: number) {
-    return prisma.post.delete({
-      where: { id },
-    });
-  },
+// Type definitions
+export type Waitlist = {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  ownerId: string;
 };
+
+// Helper function to get the base URL
+function getBaseUrl() {
+  if (typeof window !== "undefined") {
+    // Client-side: Use relative URL
+    return "";
+  }
+  // Server-side: Need absolute URL
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  const host = process.env.VERCEL_URL || process.env.HOST || "localhost:3000";
+  return `${protocol}://${host}`;
+}
+
+// Fetch waitlists for the authenticated user
+export async function getUserWaitlists(
+  serverHeaders?: Headers
+): Promise<Waitlist[]> {
+  const baseUrl = getBaseUrl();
+
+  // Prepare headers with authentication cookies if on server-side
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // If server headers are provided, forward the cookie header for authentication
+  if (serverHeaders && serverHeaders.has("cookie")) {
+    headers["cookie"] = serverHeaders.get("cookie") as string;
+  }
+
+  const response = await fetch(`${baseUrl}/api/waitlists`, {
+    method: "GET",
+    headers,
+    // This ensures the request isn't cached and is made fresh every time
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to fetch waitlists");
+  }
+
+  return response.json();
+}
+
+// Create a new waitlist for the authenticated user
+export async function createWaitlist(
+  data: {
+    name: string;
+    slug: string;
+  },
+  serverHeaders?: Headers
+): Promise<Waitlist> {
+  const baseUrl = getBaseUrl();
+
+  // Prepare headers with authentication cookies if on server-side
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // If server headers are provided, forward the cookie header for authentication
+  if (serverHeaders && serverHeaders.has("cookie")) {
+    headers["cookie"] = serverHeaders.get("cookie") as string;
+  }
+
+  const response = await fetch(`${baseUrl}/api/waitlists`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+    // This ensures the request isn't cached and is made fresh every time
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to create waitlist");
+  }
+
+  return response.json();
+}
