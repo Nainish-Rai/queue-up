@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Trophy,
   Link as LinkIcon,
+  Settings,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import Link from "next/link";
@@ -50,6 +51,12 @@ export default async function WaitlistOverviewPage({
               <p className="text-muted-foreground mt-1">/{waitlistData.slug}</p>
             </div>
             <div className="flex items-center gap-3">
+              <Link href={`/dashboard/${waitlistData.id}/settings`}>
+                <Button variant="outline">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
               <Link href={publicUrl} target="_blank">
                 <Button variant="outline">
                   <LinkIcon className="w-4 h-4 mr-2" />
