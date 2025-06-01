@@ -9,13 +9,12 @@ export type Waitlist = {
 
 // Helper function to get the base URL
 function getBaseUrl() {
-  if (typeof window !== "undefined") {
-    // Client-side: Use relative URL
-    return "";
-  }
-  // Server-side: Need absolute URL
+  // Use environment variables to determine the base URL consistently between client and server
+  const host =
+    process.env.NEXT_PUBLIC_VERCEL_URL ||
+    process.env.NEXT_PUBLIC_HOST ||
+    "localhost:3000";
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const host = process.env.VERCEL_URL || process.env.HOST || "localhost:3000";
   return `${protocol}://${host}`;
 }
 
