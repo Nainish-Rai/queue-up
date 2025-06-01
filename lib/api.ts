@@ -30,6 +30,7 @@ export type SignupResult = {
   success: boolean;
   message: string;
   referralId?: string;
+  position?: number;
 };
 
 // Helper function to get the base URL

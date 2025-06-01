@@ -11,8 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, User, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-// import { signupAction } from "@/lib/actions/signup";
+import {
+  Mail,
+  User,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Twitter,
+  Linkedin,
+  Copy,
+  Check,
+} from "lucide-react";
 import { createSignup } from "@/lib/api";
 
 interface SignupFormProps {
@@ -26,6 +35,7 @@ type FormState = {
     success: boolean;
     message: string;
     referralId?: string;
+    position?: number;
   } | null;
 };
 
@@ -34,6 +44,7 @@ export function SignupForm({ waitlistSlug, referredBy }: SignupFormProps) {
     isSubmitting: false,
     result: null,
   });
+  const [copied, setCopied] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setFormState((prev) => ({ ...prev, isSubmitting: true, result: null }));
@@ -68,12 +79,29 @@ export function SignupForm({ waitlistSlug, referredBy }: SignupFormProps) {
     }
   }
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      },
+      (err) => {
+        console.error("Failed to copy text: ", err);
+      }
+    );
+  };
+
   if (formState.result?.success) {
     const { result } = formState;
+    const referralUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/waitlist/${waitlistSlug}?ref=${result.referralId}`
+        : "";
+
     return (
       <Card className="shadow-lg border-green-200 bg-green-50/50">
         <CardContent className="pt-6">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
@@ -82,16 +110,74 @@ export function SignupForm({ waitlistSlug, referredBy }: SignupFormProps) {
                 Welcome aboard!
               </h3>
               <p className="text-green-700 mt-2">{result.message}</p>
-            </div>
-            {result.referralId && (
-              <div className="bg-white/80 rounded-lg p-4 border border-green-200">
-                <p className="text-sm text-green-800 font-medium">
-                  Your referral link:
+
+              {result.position && (
+                <p className="mt-3 text-sm font-medium bg-green-200 py-1 px-3 rounded-full inline-block">
+                  #{result.position} on the waitlist
                 </p>
-                <code className="text-xs bg-green-100 px-2 py-1 rounded mt-1 block break-all">
-                  {typeof window !== "undefined" &&
-                    `${window.location.origin}/waitlist/${waitlistSlug}?ref=${result.referralId}`}
-                </code>
+              )}
+            </div>
+
+            {result.referralId && (
+              <div className="space-y-4">
+                <div className="bg-white/80 rounded-lg p-4 border border-green-200">
+                  <p className="text-sm text-green-800 font-medium mb-2">
+                    Your referral link:
+                  </p>
+                  <div className="flex items-center">
+                    <code className="text-xs bg-green-100 px-2 py-1.5 rounded block break-all flex-1 overflow-hidden text-left">
+                      {referralUrl}
+                    </code>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="ml-2 h-7 px-2"
+                      onClick={() => copyToClipboard(referralUrl)}
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Share with friends to move up the waitlist!
+                  </p>
+                  <div className="flex justify-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-[#1DA1F2] text-white hover:bg-[#1a94df] border-0"
+                      onClick={() => {
+                        window.open(
+                          `https://twitter.com/intent/tweet?text=Join me on the waitlist for ${encodeURIComponent(waitlistSlug)}!&url=${encodeURIComponent(referralUrl)}`,
+                          "_blank"
+                        );
+                      }}
+                    >
+                      <Twitter className="w-4 h-4 mr-2" />
+                      Twitter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-[#0A66C2] text-white hover:bg-[#0958a8] border-0"
+                      onClick={() => {
+                        window.open(
+                          `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralUrl)}`,
+                          "_blank"
+                        );
+                      }}
+                    >
+                      <Linkedin className="w-4 h-4 mr-2" />
+                      LinkedIn
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

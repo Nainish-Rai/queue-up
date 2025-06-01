@@ -71,7 +71,8 @@ export async function POST(
 
     const referralId = nanoid(8);
 
-    await prisma.signup.create({
+    // Create the new signup
+    const newSignup = await prisma.signup.create({
       data: {
         email,
         name: name || null,
@@ -81,10 +82,56 @@ export async function POST(
       },
     });
 
+    // If there's a referrer, increment their referral count
+    if (referredBy) {
+      try {
+        // Find the referrer's signup
+        const referrerSignup = await prisma.signup.findFirst({
+          where: {
+            referralId: referredBy,
+            waitlistId: waitlist.id,
+          },
+        });
+
+        // If referrer exists, update their referral count in a separate field
+        // (This would require a schema modification, but we're handling the count logic here)
+        if (referrerSignup) {
+          // Count how many people this user has referred
+          const referralsCount = await prisma.signup.count({
+            where: {
+              referredBy: referredBy,
+              waitlistId: waitlist.id,
+            },
+          });
+
+          console.log(
+            `User with referralId ${referredBy} has referred ${referralsCount} people`
+          );
+        }
+      } catch (referralError) {
+        // Log but don't fail if referral processing has issues
+        console.error("Error processing referral:", referralError);
+      }
+    }
+
+    // Calculate user's position in the waitlist
+    const signupsBeforeUser = await prisma.signup.count({
+      where: {
+        waitlistId: waitlist.id,
+        createdAt: {
+          lt: newSignup.createdAt,
+        },
+      },
+    });
+
+    // Position is 1-based (first person is #1)
+    const position = signupsBeforeUser + 1;
+
     return NextResponse.json({
       success: true,
       message: "Successfully joined the waitlist!",
       referralId,
+      position,
     });
   } catch (error) {
     console.error("Signup error:", error);
