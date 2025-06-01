@@ -62,10 +62,7 @@ export type WaitlistOverview = {
 // Helper function to get the base URL
 export function getBaseUrl() {
   // Use environment variables to determine the base URL consistently between client and server
-  const host =
-    process.env.NEXT_PUBLIC_VERCEL_URL ||
-    process.env.NEXT_PUBLIC_HOST ||
-    "http://localhost:3000"; // Updated to remove the extra http://
+  const host = process.env.NEXT_PUBLIC_HOST || "http://localhost:3000"; // Updated to remove the extra http://
   return host;
 }
 
@@ -74,6 +71,7 @@ export async function getUserWaitlists(
   serverHeaders?: Headers
 ): Promise<Waitlist[]> {
   const baseUrl = getBaseUrl();
+  console.log("baseUrl", baseUrl);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
