@@ -5,6 +5,7 @@ import { UserProfile } from "@/app/components/auth/UserProfile";
 import { redirect } from "next/navigation";
 import { WaitlistCard } from "../components/waitlist/WaitlistCard";
 import { CreateWaitlistDialog } from "../components/waitlist/CreateWaitlistDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -81,8 +82,11 @@ export default async function DashboardPage() {
               Manage your waitlists and track signups
             </p>
           </div>
-          <div className="hidden sm:block">
-            <CreateWaitlistDialog />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <div className="hidden sm:block">
+              <CreateWaitlistDialog />
+            </div>
           </div>
         </div>
 
