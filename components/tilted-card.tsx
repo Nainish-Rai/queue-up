@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ExternalLink, Settings, Calendar, Hash } from "lucide-react";
 import Link from "next/link";
 import type { Waitlist } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 interface TiltedCardProps {
   waitlist?: Waitlist & { isOptimistic?: boolean };
@@ -119,11 +120,12 @@ export default function TiltedCard({
     rotateFigcaption.set(0);
   }
 
+  const router = useRouter();
   function handleCardClick(e: React.MouseEvent) {
     if (waitlist && !waitlist.isOptimistic) {
       const target = e.target as HTMLElement;
       if (!target.closest("button") && !target.closest("a")) {
-        window.location.href = `/dashboard/${waitlist.id}`;
+        router.push(`/dashboard/${waitlist.id}`);
       }
     }
   }
@@ -185,7 +187,7 @@ export default function TiltedCard({
           />
         ) : (
           <motion.div
-            className={`absolute top-0 left-0 rounded-[15px] will-change-transform [transform:translateZ(0)] bg-gradient-to-br ${gradientClass} overflow-hidden`}
+            className={`absolute top-0 left-0 rounded-[15px] will-change-transform [transform:translateZ(0)] bg-gradient-to-br ${gradientClass}  overflow-hidden`}
             style={{
               width: imageWidth,
               height: imageHeight,
@@ -201,14 +203,14 @@ export default function TiltedCard({
 
         {waitlist && (
           <motion.div
-            className="absolute inset-0 p-4 text-white [transform:translateZ(20px)] flex flex-col justify-between"
+            className="absolute inset-0 p-5 text-white [transform:translateZ(20px)] flex flex-col justify-between"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 + 0.2 }}
           >
             <div>
               <div className="flex items-start justify-between mb-2">
-                <h3 className="text-2xl font-bold text-slate-100 font-mono drop-shadow-lg flex items-center gap-2">
+                <h3 className="text-2xl  font-mono  text-slate-100 font-medium drop-shadow-md flex items-center gap-2">
                   {waitlist.name}
                 </h3>
                 <Badge

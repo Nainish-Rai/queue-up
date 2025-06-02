@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 
 interface AuthFormsProps {
   defaultView?: "signin" | "signup";
@@ -58,6 +59,7 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export function AuthForms({ defaultView = "signin" }: AuthFormsProps) {
+  const router = useRouter();
   const [view, setView] = useState<"signin" | "signup">(defaultView);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +130,7 @@ export function AuthForms({ defaultView = "signin" }: AuthFormsProps) {
         {
           onSuccess: () => {
             // Handled by the callback URL
+            router.push("/dashboard");
           },
           onError: (ctx) => {
             handleAuthError(ctx.error.message);

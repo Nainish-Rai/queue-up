@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard,
   List,
@@ -15,12 +17,12 @@ import {
   Settings,
   BarChart3,
   ChevronDown,
-  Sparkles,
 } from "lucide-react";
 import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
 import { Waitlist } from "@prisma/client";
+import { GalleryVerticalEndIcon } from "../ui/gallery-vertical-end";
 
 const gradients = [
   "from-purple-600 via-pink-600 to-blue-600",
@@ -79,8 +81,8 @@ function WaitlistItem({
     <div className="space-y-1">
       <motion.div
         ref={ref}
-        className={`relative overflow-hidden rounded-xl transition-all duration-300 cursor-pointer group ${
-          isActive ? "ring-2 ring-primary/50" : ""
+        className={`relative overflow-hidden  transition-all duration-300 cursor-pointer group ${
+          isActive ? "ring-2 ring-primary/20" : ""
         }`}
         style={{ scale, rotateY }}
         onMouseEnter={handleMouseEnter}
@@ -88,7 +90,7 @@ function WaitlistItem({
         onClick={onToggle}
       >
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+          className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10 group-hover:opacity-50 transition-opacity duration-300 `}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)] group-hover:opacity-100 opacity-0 transition-opacity duration-300" />
 
@@ -101,14 +103,14 @@ function WaitlistItem({
               <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">
                 {waitlist.name}
               </span>
-              <div className="flex items-center gap-2 mt-1">
+              {/* <div className="flex items-center gap-2 mt-1">
                 <Badge
                   variant="outline"
                   className="text-xs px-1.5 py-0.5 bg-background/50"
                 >
                   {waitlist.slug}
                 </Badge>
-              </div>
+              </div> */}
             </div>
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -168,6 +170,7 @@ export function DashboardNav() {
   const [expandedWaitlist, setExpandedWaitlist] = useState<string | null>(null);
   const { waitlists, isLoading } = useWaitlists();
   const pathname = usePathname();
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const isActiveRoute = (route: string) => {
     if (route === "/dashboard" && pathname === "/dashboard") return true;
@@ -211,13 +214,13 @@ export function DashboardNav() {
       <motion.aside
         initial={false}
         animate={{
-          x: isOpen || window.innerWidth >= 1024 ? 0 : "-100%",
+          x: isOpen || isLargeScreen ? 0 : "-100%",
         }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed top-0 left-2 rounded-2xl my-2 z-40 w-64 h-full bg-card/95 backdrop-blur-xl border-r border-border/50 overflow-hidden"
+        className="fixed top-0 left-0 rounded-2xl  z-40 w-64 h-full bg-card/95 backdrop-blur-xl border-r border-border/50 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/50 to-muted/30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(120,119,198,0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-background border" />
+        {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(120,119,198,0.1),transparent_50%)]" /> */}
 
         <div className="relative flex flex-col h-full">
           <motion.div
@@ -228,24 +231,20 @@ export function DashboardNav() {
           >
             <Link href="/dashboard" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-primary/25 transition-all duration-300">
-                  <List className="w-5 h-5 text-primary-foreground" />
-                </div>
+                <GalleryVerticalEndIcon />
+
                 <div className="absolute -inset-1 bg-gradient-to-br from-primary/20 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
-                  Sublist
-                </span>
+                <span className="text-xl font-medium ">Queue Up</span>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Sparkles className="w-3 h-3" />
-                  <span>Dashboard</span>
+                  Beta v1
                 </div>
               </div>
             </Link>
           </motion.div>
 
-          <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
+          <nav className="flex-1 p-3 space-y-3 hide-scrollbar overflow-y-auto">
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -320,7 +319,7 @@ export function DashboardNav() {
                   </p>
                 </motion.div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 scrollbar-hide hide-scrollbar overflow-y-auto">
                   {waitlists.map((waitlist, index) => (
                     <motion.div
                       key={waitlist.id}

@@ -2,7 +2,7 @@
 
 import { CreateWaitlistDialog } from "../../components/waitlist/CreateWaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { List, Sparkles } from "lucide-react";
+import { List } from "lucide-react";
 import { useWaitlists } from "../providers/WaitlistProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltedCard from "@/components/tilted-card";
@@ -18,7 +18,7 @@ function WaitlistsSkeleton() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
         >
-          <Skeleton className="w-full h-full rounded-lg" />
+          <Skeleton className="w-full h-full max-h-72 rounded-lg" />
         </motion.div>
       ))}
     </div>
@@ -58,13 +58,6 @@ function EmptyState() {
         Get started by creating your first waitlist to collect and manage
         signups for your product or service.
       </motion.p>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <CreateWaitlistDialog />
-      </motion.div>
     </motion.div>
   );
 }
@@ -110,49 +103,6 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <motion.div
-        className="mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <motion.h1
-              className="text-3xl font-bold tracking-tight flex items-center gap-2"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <motion.div
-                initial={{ rotate: -10, scale: 0 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
-              >
-                <Sparkles className="w-8 h-8 text-primary" />
-              </motion.div>
-              Overview
-            </motion.h1>
-            <motion.p
-              className="text-muted-foreground mt-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              Manage your waitlists and track signups
-            </motion.p>
-          </div>
-          <motion.div
-            className="sm:hidden"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <CreateWaitlistDialog />
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <motion.div
         className="bg-card rounded-xl border shadow-sm p-6"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -160,14 +110,18 @@ export default function DashboardPage() {
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <motion.h2
-              className="text-xl font-semibold"
+            <motion.h1
+              className="text-2xl font-semibold"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              Your Waitlists
-            </motion.h2>
+              {" "}
+              <span className="times text-4xl font-normal">
+                {" "}
+                Your Waitlists
+              </span>
+            </motion.h1>
             <motion.p
               className="text-sm text-muted-foreground mt-1"
               initial={{ opacity: 0 }}
