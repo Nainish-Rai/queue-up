@@ -15,11 +15,11 @@ import {
   Plus,
   Menu,
   X,
-  Settings,
   BarChart3,
   ChevronDown,
   Users,
   Puzzle,
+  Blocks,
 } from "lucide-react";
 import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
@@ -129,9 +129,9 @@ function WaitlistItem({
           >
             <div className="ml-4 space-y-1 py-1 border-l border-border/50 pl-4">
               <Link
-                href={`/dashboard/${waitlist.id}`}
+                href={`/dashboard/${waitlist.id}/analytics`}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
-                  pathname === `/dashboard/${waitlist.id}`
+                  pathname === `/dashboard/${waitlist.id}/analytics`
                     ? "bg-primary/10 text-primary border border-primary/20"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
@@ -153,6 +153,18 @@ function WaitlistItem({
                 <span>Signups</span>
               </Link>
               <Link
+                href={`/dashboard/${waitlist.id}/settings`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
+                  pathname === `/dashboard/${waitlist.id}/settings`
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+                onClick={onLinkClick}
+              >
+                <Blocks className="w-3 h-3" />
+                <span>No-Code Builder</span>
+              </Link>
+              <Link
                 href={`/dashboard/${waitlist.id}/integrations`}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
                   pathname === `/dashboard/${waitlist.id}/integrations`
@@ -163,18 +175,6 @@ function WaitlistItem({
               >
                 <Puzzle className="w-3 h-3" />
                 <span>Integrations</span>
-              </Link>
-              <Link
-                href={`/dashboard/${waitlist.id}/settings`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
-                  pathname === `/dashboard/${waitlist.id}/settings`
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-                onClick={onLinkClick}
-              >
-                <Settings className="w-3 h-3" />
-                <span>Settings</span>
               </Link>
             </div>
           </motion.div>

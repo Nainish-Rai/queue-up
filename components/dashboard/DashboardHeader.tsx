@@ -80,6 +80,14 @@ export function DashboardHeader({ session }: DashboardHeaderProps) {
           isActive: true,
         });
       }
+
+      if (pathSegments[3] === "analytics") {
+        breadcrumbs.push({
+          label: "Analytics",
+          href: `/dashboard/${pathSegments[2]}/analytics`,
+          isActive: true,
+        });
+      }
     }
 
     return breadcrumbs;
