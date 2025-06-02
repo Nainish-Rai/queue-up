@@ -20,6 +20,7 @@ import {
   Users,
   Puzzle,
   Blocks,
+  Target,
 } from "lucide-react";
 import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
@@ -129,17 +130,18 @@ function WaitlistItem({
           >
             <div className="ml-4 space-y-1 py-1 border-l border-border/50 pl-4">
               <Link
-                href={`/dashboard/${waitlist.id}/analytics`}
+                href={`/dashboard/${waitlist.id}`}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
-                  pathname === `/dashboard/${waitlist.id}/analytics`
+                  pathname === `/dashboard/${waitlist.id}`
                     ? "bg-primary/10 text-primary border border-primary/20"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
                 onClick={onLinkClick}
               >
-                <BarChart3 className="w-3 h-3" />
-                <span>Analytics</span>
+                <Target className="w-3 h-3" />
+                <span>Overview</span>
               </Link>
+
               <Link
                 href={`/dashboard/${waitlist.id}/signups`}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
@@ -163,6 +165,18 @@ function WaitlistItem({
               >
                 <Blocks className="w-3 h-3" />
                 <span>No-Code Builder</span>
+              </Link>
+              <Link
+                href={`/dashboard/${waitlist.id}`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
+                  pathname === `/dashboard/${waitlist.id}/analytics`
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+                onClick={onLinkClick}
+              >
+                <BarChart3 className="w-3 h-3" />
+                <span>Analytics</span>
               </Link>
               <Link
                 href={`/dashboard/${waitlist.id}/integrations`}

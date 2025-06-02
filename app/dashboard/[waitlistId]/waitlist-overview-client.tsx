@@ -2,7 +2,14 @@
 
 import { motion } from "framer-motion";
 import { formatDistanceToNow, format } from "date-fns";
-import { Users, Calendar, Trophy, LinkIcon, ExternalLink } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  Trophy,
+  LinkIcon,
+  ExternalLink,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
 
 import AnimatedStatsCard from "@/components/animated-stats-card";
@@ -63,6 +70,12 @@ export function WaitlistOverviewClient({
           </Badge>
         </div>
         <div className="flex items-center gap-3">
+          <Link href={`/dashboard/${waitlistData.id}/settings`}>
+            <Button variant="outline" size="sm">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+          </Link>
           <Link href={publicUrl} target="_blank">
             <Button variant="outline" size="sm">
               <LinkIcon className="w-4 h-4 mr-2" />
