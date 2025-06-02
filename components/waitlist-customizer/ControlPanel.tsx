@@ -70,8 +70,8 @@ export function ControlPanel({
   };
 
   return (
-    <div className="w-80 lg:w-80 md:w-72 sm:w-64 border-r bg-muted/30 flex flex-col flex-shrink-0 overflow-hidden">
-      <div className="p-3 md:p-4 border-b flex-shrink-0">
+    <div className="w-80 lg:w-96 border-x md:w-72 sm:w-64  bg-muted/30 flex flex-col flex-shrink-0 overflow-hidden">
+      <div className="p-3 md:p-2 md:px-4 border-b flex-shrink-0">
         <h2 className="font-semibold text-base md:text-lg">Customize</h2>
         <p className="text-xs md:text-sm text-muted-foreground">
           Adjust settings to match your brand
@@ -88,7 +88,7 @@ export function ControlPanel({
                 <motion.button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`relative flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-sm transition-colors flex-1 justify-center min-w-0 ${
+                  className={`relative cursor-pointer flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-sm transition-colors flex-1 justify-center min-w-0 ${
                     isActive
                       ? "text-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -99,7 +99,7 @@ export function ControlPanel({
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-background rounded-sm shadow-sm"
+                      className="absolute cursor-pointer inset-0 bg-background rounded-sm shadow-sm"
                       initial={false}
                       transition={{
                         type: "spring",

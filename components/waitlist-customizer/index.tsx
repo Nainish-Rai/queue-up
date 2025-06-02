@@ -137,17 +137,6 @@ export function WaitlistCustomizer({
 
   return (
     <div className="flex h-full overflow-hidden">
-      <ControlPanel
-        options={options}
-        updateOption={updateOption}
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        copied={copied}
-        onCopyEmbedCode={copyToClipboard}
-        embedCode={generateSimpleEmbedCode()}
-        hasChanges={hasChanges}
-      />
-
       <PreviewPanel
         options={options}
         waitlistName={waitlistName}
@@ -158,6 +147,16 @@ export function WaitlistCustomizer({
         onSave={saveCustomization}
         isSavingButtonHovered={isSavingButtonHovered}
         setIsSavingButtonHovered={setIsSavingButtonHovered}
+      />
+      <ControlPanel
+        options={options}
+        updateOption={updateOption}
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        copied={copied}
+        onCopyEmbedCode={copyToClipboard}
+        embedCode={generateSimpleEmbedCode()}
+        hasChanges={hasChanges}
       />
     </div>
   );

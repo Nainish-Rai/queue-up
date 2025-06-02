@@ -6,6 +6,7 @@
 
 .times {
   font-family: "Times New Roman", Times, serif;
+  font-style: italic;
 }
 :root {
   --background: oklch(0.9821 0 0);

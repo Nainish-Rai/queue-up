@@ -46,7 +46,7 @@ export default async function WaitlistSettingsPage({
         </div>
       </div> */}
 
-      <div className="flex-1 overflow-hidden px-4 min-w-0">
+      <div className="flex-1 overflow-hidden min-w-0">
         <WaitlistCustomizer
           waitlistName={waitlistData.name}
           waitlistSlug={waitlistData.slug}

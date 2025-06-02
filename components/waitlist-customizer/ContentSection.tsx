@@ -51,7 +51,7 @@ export function ContentSection({ options, updateOption }: ContentSectionProps) {
         />
       </div>
 
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <Label htmlFor="placeholderText" className="text-sm font-medium">
           Email Placeholder
         </Label>
@@ -61,7 +61,7 @@ export function ContentSection({ options, updateOption }: ContentSectionProps) {
           onChange={(e) => updateOption("placeholderText", e.target.value)}
           placeholder="Enter your email"
         />
-      </div>
+      </div> */}
     </>
   );
 }

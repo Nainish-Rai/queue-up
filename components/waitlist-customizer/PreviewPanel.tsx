@@ -38,7 +38,7 @@ export function PreviewPanel({
 }: PreviewPanelProps) {
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <div className="p-3 md:p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
+      <div className="p-3 md:p-2 md:px-4 border-b bg-red-300 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 min-w-0">
             <Eye className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
@@ -81,9 +81,7 @@ export function PreviewPanel({
                 size="sm"
                 onClick={onSave}
                 disabled={!hasChanges || isSaving}
-                className={`h-8 px-3 ${
-                  hasChanges ? "bg-green-600 hover:bg-green-700 text-white" : ""
-                }`}
+                className={`h-8 px-3 ${hasChanges ? " " : ""}`}
                 onMouseEnter={() => setIsSavingButtonHovered(true)}
                 onMouseLeave={() => setIsSavingButtonHovered(false)}
               >
@@ -103,16 +101,16 @@ export function PreviewPanel({
         </div>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 overflow-auto min-h-0">
+      <div className="overflow-auto min-h-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <motion.div
           key={previewDevice}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex justify-center items-center min-h-full w-full"
+          className="flex flex-col items-center justify-center pt-4 px-4 min-h-full h-[calc(100vh-10rem)] w-full"
         >
           <div
-            className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl border overflow-hidden"
+            className="bg-white overflow-y-scroll flex-1 dark:bg-slate-900 rounded-lg shadow-2xl border   "
             style={{
               width: deviceSizes[previewDevice].width,
               height: deviceSizes[previewDevice].height,
@@ -122,9 +120,7 @@ export function PreviewPanel({
               padding: `${options.padding}px`,
             }}
           >
-            <div className="h-full flex items-center justify-center overflow-auto">
-              <LivePreviewForm options={options} waitlistName={waitlistName} />
-            </div>
+            <LivePreviewForm options={options} waitlistName={waitlistName} />
           </div>
         </motion.div>
       </div>
