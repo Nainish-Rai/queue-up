@@ -1,10 +1,9 @@
 import { getWaitlistOverview } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { EmbedCodeGenerator } from "@/components/embed-code-generator";
-import { Settings, Code } from "lucide-react";
+import { Settings } from "lucide-react";
+import { WaitlistCustomizer } from "@/components/waitlist-customizer";
 
 interface WaitlistSettingsPageProps {
   params: Promise<{
@@ -27,37 +26,33 @@ export default async function WaitlistSettingsPage({
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      <div className="mb-8">
+    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="p-4 md:p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
         <div className="flex items-center gap-3 mb-2">
-          <Settings className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <Settings className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Settings
+          </h1>
         </div>
-        <p className="text-muted-foreground">
-          Configure your waitlist settings and embed options
+        <p className="text-muted-foreground text-sm md:text-base">
+          Customize your waitlist appearance and embed options
         </p>
-        <div className="flex items-center gap-2 mt-3">
-          <Badge variant="outline">{waitlistData.name}</Badge>
-          <span className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <Badge variant="outline" className="text-xs md:text-sm">
+            {waitlistData.name}
+          </Badge>
+          <span className="text-xs md:text-sm text-muted-foreground">
             /{waitlistData.slug}
           </span>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Code className="w-5 h-5" />
-            Embed Code
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EmbedCodeGenerator
-            waitlistName={waitlistData.name}
-            waitlistSlug={waitlistData.slug}
-          />
-        </CardContent>
-      </Card>
+      <div className="flex-1 overflow-hidden min-w-0">
+        <WaitlistCustomizer
+          waitlistName={waitlistData.name}
+          waitlistSlug={waitlistData.slug}
+        />
+      </div>
     </div>
   );
 }
