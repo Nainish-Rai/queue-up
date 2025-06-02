@@ -25,7 +25,7 @@ export default async function WaitlistSettingsPage({
   }
 
   return (
-    <div className="h-[calc(100vh-7.1rem)]  flex flex-col overflow-hidden">
+    <div className="h-[calc(100vh-5rem)]  flex flex-col overflow-hidden">
       {/* <div className="p-4 md:p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
         <div className="flex items-center gap-3 mb-2">
           <Settings className="w-6 h-6 md:w-8 md:h-8 text-primary" />

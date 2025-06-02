@@ -78,23 +78,44 @@ export function ControlPanel({
         </p>
       </div>
 
-      <div className="p-3 md:p-4 border-b flex-shrink-0">
-        <div className="grid grid-cols-2 gap-1 md:gap-2">
-          {sections.map((section) => {
-            const IconComponent = section.icon;
-            return (
-              <Button
-                key={section.id}
-                variant={activeSection === section.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveSection(section.id)}
-                className="justify-start gap-1 md:gap-2 text-xs md:text-sm p-2"
-              >
-                <IconComponent className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
-                <span className="truncate">{section.label}</span>
-              </Button>
-            );
-          })}
+      <div className="p-2 border-b flex-shrink-0">
+        <div className="relative">
+          <div className="flex bg-muted rounded-md p-0.5">
+            {sections.map((section) => {
+              const IconComponent = section.icon;
+              const isActive = activeSection === section.id;
+              return (
+                <motion.button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`relative flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-sm transition-colors flex-1 justify-center min-w-0 ${
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-background rounded-sm shadow-sm"
+                      initial={false}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      }}
+                    />
+                  )}
+                  <IconComponent className="w-3 h-3 flex-shrink-0 relative z-10" />
+                  <span className="truncate relative z-10 hidden md:inline text-xs">
+                    {section.label}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -111,17 +132,6 @@ export function ControlPanel({
             {renderActiveSection()}
           </motion.div>
         </AnimatePresence>
-      </div>
-
-      <div className="p-4 border-t">
-        <Button onClick={onCopyEmbedCode} className="w-full" size="lg">
-          {copied ? (
-            <Check className="w-4 h-4 mr-2" />
-          ) : (
-            <Copy className="w-4 h-4 mr-2" />
-          )}
-          {copied ? "Copied!" : "Copy Embed Code"}
-        </Button>
       </div>
 
       <motion.div
@@ -147,16 +157,24 @@ export function ControlPanel({
           )}
         </div>
 
-        <div className="bg-slate-900 text-slate-100 p-3 md:p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto w-full">
-          <code className="whitespace-pre-wrap break-all">{embedCode}</code>
-        </div>
-
-        <div className="mt-3 text-xs text-muted-foreground">
-          <p>
-            ✨ Styles automatically update in the preview - click Save Changes
-            to persist your customizations.
-          </p>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full mb-2"
+          onClick={onCopyEmbedCode}
+        >
+          {copied ? (
+            <Check className="w-4 h-4 mr-2" />
+          ) : (
+            <Copy className="w-4 h-4 mr-2" />
+          )}
+          {copied ? "Copied!" : "Copy Embed Code"}
+        </Button>
+        {copied && (
+          <div className="bg-slate-900 text-slate-100 p-3 md:p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto w-full mt-2">
+            <code className="whitespace-pre-wrap break-all">{embedCode}</code>
+          </div>
+        )}
       </motion.div>
     </div>
   );
