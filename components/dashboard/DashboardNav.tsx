@@ -18,6 +18,8 @@ import {
   Settings,
   BarChart3,
   ChevronDown,
+  Users,
+  Puzzle,
 } from "lucide-react";
 import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
@@ -104,14 +106,6 @@ function WaitlistItem({
               <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">
                 {waitlist.name}
               </span>
-              {/* <div className="flex items-center gap-2 mt-1">
-                <Badge
-                  variant="outline"
-                  className="text-xs px-1.5 py-0.5 bg-background/50"
-                >
-                  {waitlist.slug}
-                </Badge>
-              </div> */}
             </div>
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -145,6 +139,30 @@ function WaitlistItem({
               >
                 <BarChart3 className="w-3 h-3" />
                 <span>Analytics</span>
+              </Link>
+              <Link
+                href={`/dashboard/${waitlist.id}/signups`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
+                  pathname === `/dashboard/${waitlist.id}/signups`
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+                onClick={onLinkClick}
+              >
+                <Users className="w-3 h-3" />
+                <span>Signups</span>
+              </Link>
+              <Link
+                href={`/dashboard/${waitlist.id}/integrations`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
+                  pathname === `/dashboard/${waitlist.id}/integrations`
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+                onClick={onLinkClick}
+              >
+                <Puzzle className="w-3 h-3" />
+                <span>Integrations</span>
               </Link>
               <Link
                 href={`/dashboard/${waitlist.id}/settings`}

@@ -64,6 +64,22 @@ export function DashboardHeader({ session }: DashboardHeaderProps) {
           isActive: true,
         });
       }
+
+      if (pathSegments[3] === "signups") {
+        breadcrumbs.push({
+          label: "Signups",
+          href: `/dashboard/${pathSegments[2]}/signups`,
+          isActive: true,
+        });
+      }
+
+      if (pathSegments[3] === "integrations") {
+        breadcrumbs.push({
+          label: "Integrations",
+          href: `/dashboard/${pathSegments[2]}/integrations`,
+          isActive: true,
+        });
+      }
     }
 
     return breadcrumbs;
