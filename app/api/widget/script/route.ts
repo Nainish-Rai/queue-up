@@ -266,7 +266,7 @@ export async function GET() {
                 border-radius: 4px;
                 font-size: 10px;
               ">
-                Powered by Waitlist
+                Powered by Queue-Up
               </span>
             </div>
           \` : ''}
@@ -346,7 +346,7 @@ export async function GET() {
                   border-radius: 4px;
                   font-size: 10px;
                 ">
-                  Powered by Waitlist
+                  Powered by Queue-Up
                 </span>
               </div>
             \` : ''}

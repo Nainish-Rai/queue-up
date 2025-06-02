@@ -128,6 +128,7 @@ export default function WaitlistPage({
           >
             <div className="flex items-center gap-2 text-gray-400">
               <Users className="w-5 h-5" />
+              <span className="text-sm font-mono">Users</span>
             </div>
             <div className="w-px h-6 bg-gray-600" />
             <div className="flex items-center gap-2 text-gray-400">
@@ -148,22 +149,8 @@ export default function WaitlistPage({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.6, delay: 1.1 }}
-              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl"
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-2 md:p-8 shadow-2xl"
             >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1.3 }}
-                className="text-center mb-8"
-              >
-                <h2 className="text-2xl font-bold mb-3 font-mono">
-                  Join the Waitlist
-                </h2>
-                <p className="text-gray-400">
-                  Be among the first to experience something extraordinary
-                </p>
-              </motion.div>
-
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -210,7 +197,7 @@ export default function WaitlistPage({
         >
           <div className="inline-flex items-center gap-4 text-gray-500 text-sm">
             <div className="w-12 h-px bg-gray-600" />
-            <span className="font-mono tracking-wider">SUBLIST</span>
+            <span className="font-mono tracking-wider">QUEUE-UP</span>
             <div className="w-12 h-px bg-gray-600" />
           </div>
         </motion.div>

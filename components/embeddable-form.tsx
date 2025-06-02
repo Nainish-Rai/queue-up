@@ -286,7 +286,7 @@ export function EmbeddableWaitlistForm({
             <div className="px-6 pb-4">
               <div className="text-center">
                 <Badge variant="outline" className="text-xs">
-                  Powered by Waitlist
+                  Powered by Queue-Up
                 </Badge>
               </div>
             </div>
@@ -537,7 +537,7 @@ export function EmbeddableWaitlistForm({
           {customization.includeBrandBadge && (
             <div className="text-center pt-2">
               <Badge variant="outline" className="text-xs">
-                Powered by Waitlist
+                Powered by Queue-Up
               </Badge>
             </div>
           )}
