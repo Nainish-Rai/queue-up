@@ -58,6 +58,7 @@ export async function GET(
       includeLeaderboard: true,
       referrerTracking: true,
       includeBrandBadge: false,
+      includeNameField: true,
       buttonText: "Join Waitlist",
       headerText: `Join ${waitlist.name}`,
       descriptionText: "Be the first to know when we launch!",

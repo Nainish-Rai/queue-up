@@ -37,6 +37,7 @@ interface CustomizationOptions {
   fontSize: number;
   padding: number;
   shadowIntensity: number;
+  includeNameField: boolean;
 }
 
 interface EmbeddableWaitlistFormProps {
@@ -147,7 +148,7 @@ export function EmbeddableWaitlistForm({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -156,8 +157,8 @@ export function EmbeddableWaitlistForm({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-          <p className="text-sm text-red-600">
+          <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-2" />
+          <p className="text-sm text-destructive">
             {error || "Failed to load waitlist"}
           </p>
         </div>
@@ -169,12 +170,47 @@ export function EmbeddableWaitlistForm({
   const { isSubmitting, result } = formState;
   const animation = animationVariants[customization.animation];
 
+  const getThemeColors = () => {
+    switch (customization.theme) {
+      case "light":
+        return {
+          backgroundColor: "#ffffff",
+          textColor: "#1f2937",
+          cardClass: "bg-white text-gray-800",
+          shouldUseCustomColors: true,
+        };
+      case "dark":
+        return {
+          backgroundColor: "#171717",
+          textColor: "#f9fafb",
+          cardClass: "bg-gray-800 text-gray-100",
+          shouldUseCustomColors: true,
+        };
+      case "auto":
+      default:
+        return {
+          backgroundColor: customization.backgroundColor,
+          textColor: customization.textColor,
+          cardClass: "bg-card text-card-foreground border-border",
+          shouldUseCustomColors: false,
+        };
+    }
+  };
+
+  const themeColors = getThemeColors();
+  const shouldUseCustomColors = themeColors.shouldUseCustomColors;
+
   const cardStyle = {
     maxWidth: `${customization.formWidth}px`,
     borderRadius: `${customization.borderRadius}px`,
-    boxShadow: `0 ${customization.shadowIntensity * 2}px ${customization.shadowIntensity * 8}px rgba(0,0,0,${customization.shadowIntensity * 0.1})`,
+    boxShadow: `0 ${customization.shadowIntensity * 2}px ${
+      customization.shadowIntensity * 8
+    }px rgba(0,0,0,${customization.shadowIntensity * 0.1})`,
     fontSize: `${customization.fontSize}px`,
-    color: customization.textColor,
+    ...(shouldUseCustomColors && {
+      backgroundColor: themeColors.backgroundColor,
+      color: themeColors.textColor,
+    }),
   };
 
   if (result?.success) {
@@ -185,7 +221,12 @@ export function EmbeddableWaitlistForm({
         className="mx-auto"
         style={cardStyle}
       >
-        <Card className="border-green-200 bg-green-50/50" style={cardStyle}>
+        <Card
+          className={`border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/50 ${
+            shouldUseCustomColors ? "" : themeColors.cardClass
+          }`}
+          style={shouldUseCustomColors ? cardStyle : undefined}
+        >
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <motion.div
@@ -193,18 +234,28 @@ export function EmbeddableWaitlistForm({
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
-                style={{ backgroundColor: `${customization.buttonColor}20` }}
+                style={{
+                  backgroundColor: shouldUseCustomColors
+                    ? `${customization.buttonColor}20`
+                    : `hsl(var(--primary) / 0.1)`,
+                }}
               >
                 <CheckCircle2
                   className="w-8 h-8"
-                  style={{ color: customization.buttonColor }}
+                  style={{
+                    color: shouldUseCustomColors
+                      ? customization.buttonColor
+                      : `hsl(var(--primary))`,
+                  }}
                 />
               </motion.div>
               <div>
-                <h3 className="text-xl font-semibold text-green-900">
+                <h3 className="text-xl font-semibold text-green-900 dark:text-green-100">
                   Welcome aboard!
                 </h3>
-                <p className="text-green-700 mt-2">{result.message}</p>
+                <p className="text-green-700 dark:text-green-300 mt-2">
+                  {result.message}
+                </p>
 
                 {result.position && customization.includeLeaderboard && (
                   <motion.div
@@ -214,10 +265,14 @@ export function EmbeddableWaitlistForm({
                   >
                     <Badge
                       className="mt-3 text-sm font-medium py-2 px-4"
-                      style={{
-                        backgroundColor: customization.buttonColor,
-                        color: customization.buttonTextColor,
-                      }}
+                      style={
+                        shouldUseCustomColors
+                          ? {
+                              backgroundColor: customization.buttonColor,
+                              color: customization.buttonTextColor,
+                            }
+                          : undefined
+                      }
                     >
                       <Trophy className="w-4 h-4 mr-1" />#{result.position} on
                       the waitlist
@@ -249,28 +304,50 @@ export function EmbeddableWaitlistForm({
       style={cardStyle}
     >
       <Card
-        className="hover:shadow-xl transition-shadow duration-300"
-        style={cardStyle}
+        className={`hover:shadow-xl transition-shadow duration-300 ${
+          shouldUseCustomColors ? "" : themeColors.cardClass
+        }`}
+        style={
+          shouldUseCustomColors
+            ? cardStyle
+            : {
+                maxWidth: `${customization.formWidth}px`,
+                borderRadius: `${customization.borderRadius}px`,
+                fontSize: `${customization.fontSize}px`,
+              }
+        }
       >
         <CardHeader className="space-y-3">
           <div className="flex items-center gap-3">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              className="w-10 h-10 rounded-lg flex  items-center justify-center"
               style={{
-                backgroundColor: `${customization.buttonColor}20`,
+                backgroundColor: shouldUseCustomColors
+                  ? `${customization.buttonColor}20`
+                  : `hsl(var(--primary) / 0.1)`,
                 borderRadius: `${customization.borderRadius * 0.6}px`,
               }}
             >
               <Mail
                 className="w-5 h-5"
-                style={{ color: customization.buttonColor }}
+                style={{
+                  color: shouldUseCustomColors
+                    ? customization.buttonColor
+                    : `hsl(var(--primary))`,
+                }}
               />
             </motion.div>
             <div>
               <CardTitle
                 className="text-lg"
-                style={{ color: customization.textColor }}
+                style={
+                  shouldUseCustomColors
+                    ? {
+                        color: themeColors.textColor,
+                      }
+                    : undefined
+                }
               >
                 {customization.headerText || waitlist.name}
               </CardTitle>
@@ -282,8 +359,14 @@ export function EmbeddableWaitlistForm({
           </div>
           {customization.descriptionText && (
             <p
-              className="text-sm"
-              style={{ color: customization.textColor, opacity: 0.8 }}
+              className="text-sm opacity-80"
+              style={
+                shouldUseCustomColors
+                  ? {
+                      color: themeColors.textColor,
+                    }
+                  : undefined
+              }
             >
               {customization.descriptionText}
             </p>
@@ -296,7 +379,13 @@ export function EmbeddableWaitlistForm({
               <Label
                 htmlFor="email"
                 className="text-sm font-medium"
-                style={{ color: customization.textColor }}
+                style={
+                  shouldUseCustomColors
+                    ? {
+                        color: themeColors.textColor,
+                      }
+                    : undefined
+                }
               >
                 Email Address
               </Label>
@@ -305,46 +394,76 @@ export function EmbeddableWaitlistForm({
                 name="email"
                 type="email"
                 placeholder={customization.placeholderText}
-                className="h-10"
+                className={`h-10 ${
+                  shouldUseCustomColors
+                    ? ""
+                    : "bg-background border-input text-foreground"
+                }`}
                 style={{
                   borderRadius: `${customization.borderRadius * 0.5}px`,
                   fontSize: `${customization.fontSize * 0.9}px`,
+                  ...(shouldUseCustomColors && {
+                    backgroundColor:
+                      customization.theme === "dark" ? "#374151" : "#f9fafb",
+                    borderColor:
+                      customization.theme === "dark" ? "#4b5563" : "#d1d5db",
+                    color: themeColors.textColor,
+                  }),
                 }}
                 required
                 disabled={isSubmitting}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="name"
-                className="text-sm font-medium"
-                style={{ color: customization.textColor }}
-              >
-                Name{" "}
-                <span className="text-muted-foreground text-xs">
-                  (Optional)
-                </span>
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Your name"
-                className="h-10"
-                style={{
-                  borderRadius: `${customization.borderRadius * 0.5}px`,
-                  fontSize: `${customization.fontSize * 0.9}px`,
-                }}
-                disabled={isSubmitting}
-              />
-            </div>
+            {customization.includeNameField && (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="name"
+                  className="text-sm font-medium"
+                  style={
+                    shouldUseCustomColors
+                      ? {
+                          color: themeColors.textColor,
+                        }
+                      : undefined
+                  }
+                >
+                  Name{" "}
+                  <span className="text-muted-foreground text-xs">
+                    (Optional)
+                  </span>
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Your name"
+                  className={`h-10 ${
+                    shouldUseCustomColors
+                      ? ""
+                      : "bg-background border-input text-foreground"
+                  }`}
+                  style={{
+                    borderRadius: `${customization.borderRadius * 0.5}px`,
+                    fontSize: `${customization.fontSize * 0.9}px`,
+                    ...(shouldUseCustomColors && {
+                      backgroundColor:
+                        customization.theme === "dark" ? "#374151" : "#f9fafb",
+                      borderColor:
+                        customization.theme === "dark" ? "#4b5563" : "#d1d5db",
+                      color: themeColors.textColor,
+                    }),
+                  }}
+                  disabled={isSubmitting}
+                />
+              </div>
+            )}
 
             {result?.success === false && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg"
+                className="flex items-center gap-2 p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-lg"
                 style={{
                   borderRadius: `${customization.borderRadius * 0.5}px`,
                 }}
@@ -358,13 +477,20 @@ export function EmbeddableWaitlistForm({
               <Button
                 type="submit"
                 className="w-full h-11 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200"
-                style={{
-                  backgroundColor: customization.buttonColor,
-                  color: customization.buttonTextColor,
-                  borderColor: customization.buttonColor,
-                  borderRadius: `${customization.borderRadius * 0.5}px`,
-                  fontSize: `${customization.fontSize * 0.9}px`,
-                }}
+                style={
+                  shouldUseCustomColors
+                    ? {
+                        backgroundColor: customization.buttonColor,
+                        color: customization.buttonTextColor,
+                        borderColor: customization.buttonColor,
+                        borderRadius: `${customization.borderRadius * 0.5}px`,
+                        fontSize: `${customization.fontSize * 0.9}px`,
+                      }
+                    : {
+                        borderRadius: `${customization.borderRadius * 0.5}px`,
+                        fontSize: `${customization.fontSize * 0.9}px`,
+                      }
+                }
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

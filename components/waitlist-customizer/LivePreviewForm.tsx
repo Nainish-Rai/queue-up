@@ -32,12 +32,44 @@ export function LivePreviewForm({
   const animation = animationVariants[options.animation];
   const signupCount = 1234;
 
+  // Theme-aware styling logic
+  const getThemeColors = () => {
+    switch (options.theme) {
+      case "light":
+        return {
+          backgroundColor: "#ffffff",
+          textColor: "#1f2937",
+          shouldUseCustomColors: true,
+        };
+      case "dark":
+        return {
+          backgroundColor: "#171717",
+          textColor: "#f9fafb",
+          shouldUseCustomColors: true,
+        };
+      case "auto":
+      default:
+        return {
+          backgroundColor: options.backgroundColor,
+          textColor: options.textColor,
+          shouldUseCustomColors: false,
+        };
+    }
+  };
+
+  const themeColors = getThemeColors();
+  const shouldUseCustomColors = themeColors.shouldUseCustomColors;
+
   const cardStyle = {
     maxWidth: `${options.formWidth}px`,
     borderRadius: `${options.borderRadius}px`,
     boxShadow: `0 ${options.shadowIntensity * 2}px ${options.shadowIntensity * 8}px rgba(0,0,0,${options.shadowIntensity * 0.1})`,
     fontSize: `${options.fontSize}px`,
-    color: options.textColor,
+    ...(shouldUseCustomColors && {
+      backgroundColor: themeColors.backgroundColor,
+      color: themeColors.textColor,
+      borderColor: "transparent",
+    }),
   };
 
   const handlePreviewSubmit = async (e: React.FormEvent) => {
@@ -59,7 +91,14 @@ export function LivePreviewForm({
         className="mx-auto"
         style={cardStyle}
       >
-        <Card className="border-green-200 bg-green-50/50" style={cardStyle}>
+        <Card
+          className={`border-green-200 bg-green-50/50 ${
+            shouldUseCustomColors
+              ? ""
+              : "dark:border-green-800 dark:bg-green-950/50"
+          }`}
+          style={cardStyle}
+        >
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <motion.div
@@ -125,7 +164,7 @@ export function LivePreviewForm({
       style={cardStyle}
     >
       <Card
-        className="hover:shadow-xl transition-shadow duration-300"
+        className="hover:shadow-xl border-border transition-shadow duration-300"
         style={cardStyle}
       >
         <CardHeader className="space-y-3">
@@ -146,7 +185,11 @@ export function LivePreviewForm({
             <div>
               <CardTitle
                 className="text-lg"
-                style={{ color: options.textColor }}
+                style={{
+                  color: shouldUseCustomColors
+                    ? themeColors.textColor
+                    : options.textColor,
+                }}
               >
                 {options.headerText || waitlistName}
               </CardTitle>
@@ -159,7 +202,12 @@ export function LivePreviewForm({
           {options.descriptionText && (
             <p
               className="text-sm"
-              style={{ color: options.textColor, opacity: 0.8 }}
+              style={{
+                color: shouldUseCustomColors
+                  ? themeColors.textColor
+                  : options.textColor,
+                opacity: 0.8,
+              }}
             >
               {options.descriptionText}
             </p>
@@ -172,7 +220,11 @@ export function LivePreviewForm({
               <Label
                 htmlFor="preview-email"
                 className="text-sm font-medium"
-                style={{ color: options.textColor }}
+                style={{
+                  color: shouldUseCustomColors
+                    ? themeColors.textColor
+                    : options.textColor,
+                }}
               >
                 Email Address
               </Label>
@@ -184,36 +236,56 @@ export function LivePreviewForm({
                 style={{
                   borderRadius: `${options.borderRadius * 0.5}px`,
                   fontSize: `${options.fontSize * 0.9}px`,
+                  ...(shouldUseCustomColors && {
+                    backgroundColor:
+                      options.theme === "dark" ? "#374151" : "#f9fafb",
+                    borderColor:
+                      options.theme === "dark" ? "#4b5563" : "#d1d5db",
+                    color: themeColors.textColor,
+                  }),
                 }}
                 disabled={isSubmitting}
                 defaultValue="demo@example.com"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="preview-name"
-                className="text-sm font-medium"
-                style={{ color: options.textColor }}
-              >
-                Name{" "}
-                <span className="text-muted-foreground text-xs">
-                  (Optional)
-                </span>
-              </Label>
-              <Input
-                id="preview-name"
-                type="text"
-                placeholder="Your name"
-                className="h-10"
-                style={{
-                  borderRadius: `${options.borderRadius * 0.5}px`,
-                  fontSize: `${options.fontSize * 0.9}px`,
-                }}
-                disabled={isSubmitting}
-                defaultValue="Demo User"
-              />
-            </div>
+            {options.includeNameField && (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="preview-name"
+                  className="text-sm font-medium"
+                  style={{
+                    color: shouldUseCustomColors
+                      ? themeColors.textColor
+                      : options.textColor,
+                  }}
+                >
+                  Name{" "}
+                  <span className="text-muted-foreground text-xs">
+                    (Optional)
+                  </span>
+                </Label>
+                <Input
+                  id="preview-name"
+                  type="text"
+                  placeholder="Your name"
+                  className="h-10"
+                  style={{
+                    borderRadius: `${options.borderRadius * 0.5}px`,
+                    fontSize: `${options.fontSize * 0.9}px`,
+                    ...(shouldUseCustomColors && {
+                      backgroundColor:
+                        options.theme === "dark" ? "#374151" : "#f9fafb",
+                      borderColor:
+                        options.theme === "dark" ? "#4b5563" : "#d1d5db",
+                      color: themeColors.textColor,
+                    }),
+                  }}
+                  disabled={isSubmitting}
+                  defaultValue="Demo User"
+                />
+              </div>
+            )}
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button

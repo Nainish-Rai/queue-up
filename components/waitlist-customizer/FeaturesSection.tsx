@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BarChart3, Link, Crown } from "lucide-react";
+import { BarChart3, Link, Crown, User } from "lucide-react";
 import { CustomizationOptions } from "./types";
 
 interface FeaturesSectionProps {
@@ -28,6 +28,24 @@ export function FeaturesSection({
   return (
     <>
       <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Include Name Field
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Show optional name field in form
+            </p>
+          </div>
+          <Switch
+            checked={options.includeNameField}
+            onCheckedChange={(checked) =>
+              updateOption("includeNameField", checked)
+            }
+          />
+        </div>
+
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <Label className="text-sm font-medium flex items-center gap-2">

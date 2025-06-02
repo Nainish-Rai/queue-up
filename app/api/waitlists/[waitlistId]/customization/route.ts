@@ -15,6 +15,7 @@ const customizationSchema = z.object({
   includeLeaderboard: z.boolean(),
   referrerTracking: z.boolean(),
   includeBrandBadge: z.boolean(),
+  includeNameField: z.boolean(),
   buttonText: z.string(),
   headerText: z.string(),
   descriptionText: z.string(),

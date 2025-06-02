@@ -25,6 +25,7 @@ export function WaitlistCustomizer({
     includeLeaderboard: true,
     referrerTracking: true,
     includeBrandBadge: false,
+    includeNameField: true,
     buttonText: "Join Waitlist",
     headerText: `Join ${waitlistName}`,
     descriptionText: "Be the first to know when we launch!",

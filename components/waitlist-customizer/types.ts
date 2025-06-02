@@ -14,6 +14,7 @@ export interface CustomizationOptions {
   includeLeaderboard: boolean;
   referrerTracking: boolean;
   includeBrandBadge: boolean;
+  includeNameField: boolean;
   buttonText: string;
   headerText: string;
   descriptionText: string;

@@ -101,7 +101,7 @@ export function PreviewPanel({
         </div>
       </div>
 
-      <div className="overflow-auto min-h-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="overflow-auto min-h-0 ">
         <motion.div
           key={previewDevice}
           initial={{ opacity: 0, scale: 0.95 }}
@@ -110,14 +110,14 @@ export function PreviewPanel({
           className="flex flex-col items-center justify-center pt-4 px-4 min-h-full h-[calc(100vh-10rem)] w-full"
         >
           <div
-            className="bg-white overflow-y-scroll flex-1 dark:bg-slate-900 rounded-lg shadow-2xl border   "
+            className=" overflow-y-auto pt-12 flex-1 rounded-lg items-center shadow-2xl border   "
             style={{
               width: deviceSizes[previewDevice].width,
               height: deviceSizes[previewDevice].height,
               maxWidth: "calc(100vw - 2rem)",
               maxHeight: "calc(100vh - 12rem)",
-              backgroundColor: options.backgroundColor,
-              padding: `${options.padding}px`,
+              // backgroundColor: options.backgroundColor,
+              // padding: `${options.padding}px`,
             }}
           >
             <LivePreviewForm options={options} waitlistName={waitlistName} />

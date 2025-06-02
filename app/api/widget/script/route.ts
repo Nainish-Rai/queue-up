@@ -22,9 +22,11 @@ export async function GET() {
       this.config = null;
       this.container = null;
       this.isSubmitting = false;
-      this.currentState = 'form'; // 'form' or 'success'
+      this.currentState = 'form';
+      this.configCache = null;
+      this.lastConfigFetch = 0;
+      this.configCacheDuration = 5000; // 5 seconds cache for faster updates
 
-      // Get the current script's URL to determine the API base URL
       const scriptElement = document.currentScript || document.querySelector('script[src*="widget/script"]');
       const scriptUrl = scriptElement?.src || '';
       this.baseUrl = scriptUrl.split('/api/')[0] || window.location.origin;
@@ -47,11 +49,25 @@ export async function GET() {
     }
 
     async loadConfig() {
-      const response = await fetch(\`\${this.baseUrl}/api/widget/\${this.waitlistSlug}/config\`);
+      const now = Date.now();
+
+      // Use cache if available and not expired
+      if (this.configCache && (now - this.lastConfigFetch) < this.configCacheDuration) {
+        this.config = this.configCache;
+        return;
+      }
+
+      // Add cache busting parameter to ensure fresh config
+      const cacheBuster = Math.floor(now / this.configCacheDuration);
+      const response = await fetch(\`\${this.baseUrl}/api/widget/\${this.waitlistSlug}/config?v=\${cacheBuster}\`);
+
       if (!response.ok) {
         throw new Error('Failed to load widget configuration');
       }
+
       this.config = await response.json();
+      this.configCache = this.config;
+      this.lastConfigFetch = now;
     }
 
     render() {
@@ -159,6 +175,7 @@ export async function GET() {
               />
             </div>
 
+            \${customization.includeNameField ? \`
             <div style="margin-bottom: 16px;">
               <label style="
                 display: block;
@@ -184,6 +201,7 @@ export async function GET() {
                 "
               />
             </div>
+            \` : ''}
 
             <button
               type="submit"
@@ -336,7 +354,6 @@ export async function GET() {
         </div>
       \`;
 
-      // Reset to form after 5 seconds
       setTimeout(() => {
         this.currentState = 'form';
         this.render();
@@ -380,7 +397,6 @@ export async function GET() {
 
       this.isSubmitting = true;
 
-      // Update button state
       if (submitBtn) {
         submitBtn.style.opacity = '0.7';
         submitBtn.style.cursor = 'not-allowed';
@@ -412,7 +428,6 @@ export async function GET() {
         console.error('Signup error:', error);
         alert(error.message || 'An error occurred. Please try again.');
 
-        // Reset button state
         if (submitBtn) {
           submitBtn.style.opacity = '1';
           submitBtn.style.cursor = 'pointer';
@@ -424,7 +439,6 @@ export async function GET() {
     }
   }
 
-  // Auto-initialize widgets
   document.addEventListener('DOMContentLoaded', function() {
     const containers = document.querySelectorAll('[data-waitlist-slug]');
     containers.forEach(container => {
@@ -436,16 +450,16 @@ export async function GET() {
     });
   });
 
-  // Export for manual initialization
   window.WaitlistWidget = WaitlistWidget;
 })();
+
 `;
 
   return new NextResponse(widgetScript, {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/javascript",
-      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+      "Cache-Control": "public, max-age=3600, stale-while-revalidate=60", // Shorter cache time
     },
   });
 }
