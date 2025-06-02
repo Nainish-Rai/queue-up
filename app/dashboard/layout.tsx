@@ -23,7 +23,7 @@ export default async function DashboardLayout({
         <DashboardNav />
         <div className="flex-1 lg:pl-64">
           <DashboardHeader session={session} />
-          <main className="px-4 py-6 lg:px-8">{children}</main>
+          <main className="px-4 py-6 lg:px-0 lg:py-0">{children}</main>
         </div>
       </div>
     </div>

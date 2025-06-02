@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useRef } from "react";
@@ -21,7 +22,7 @@ import {
 import { CreateWaitlistDialog } from "@/components/waitlist/CreateWaitlistDialog";
 import { useWaitlists } from "@/app/providers/WaitlistProvider";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
-import { Waitlist } from "@prisma/client";
+import type { Waitlist as PrismaWaitlist } from "@prisma/client";
 import { GalleryVerticalEndIcon } from "../ui/gallery-vertical-end";
 
 const gradients = [
@@ -46,7 +47,7 @@ function generateGradient(seed: string): string {
 }
 
 interface WaitlistItemProps {
-  waitlist: Waitlist;
+  waitlist: PrismaWaitlist & { customization?: unknown };
   isExpanded: boolean;
   onToggle: () => void;
   pathname: string;
@@ -328,7 +329,10 @@ export function DashboardNav() {
                       transition={{ delay: 0.4 + index * 0.1 }}
                     >
                       <WaitlistItem
-                        waitlist={waitlist}
+                        waitlist={{
+                          ...waitlist,
+                          customization: (waitlist as any).customization,
+                        }}
                         isExpanded={isWaitlistExpanded(waitlist.id)}
                         onToggle={() => toggleWaitlist(waitlist.id)}
                         pathname={pathname}
