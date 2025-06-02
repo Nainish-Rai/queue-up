@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -400,46 +400,68 @@ export function WaitlistCustomizer({
   const [previewDevice, setPreviewDevice] =
     useState<keyof typeof deviceSizes>("desktop");
   const [activeSection, setActiveSection] = useState("appearance");
+  const [isSaving, setIsSaving] = useState(false);
+  const [waitlistId, setWaitlistId] = useState<string | null>(null);
+
+  // Load waitlist ID and existing customization
+  useEffect(() => {
+    const loadWaitlistData = async () => {
+      try {
+        const response = await fetch(`/api/waitlist/${waitlistSlug}`);
+        if (response.ok) {
+          const waitlist = await response.json();
+          setWaitlistId(waitlist.id);
+
+          // If there's existing customization, merge it with defaults
+          if (waitlist.customization) {
+            setOptions((prev) => ({ ...prev, ...waitlist.customization }));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load waitlist data:", error);
+      }
+    };
+
+    loadWaitlistData();
+  }, [waitlistSlug]);
+
+  // Auto-save customization when options change
+  useEffect(() => {
+    if (!waitlistId) return;
+
+    const saveCustomization = async () => {
+      setIsSaving(true);
+      try {
+        await fetch(`/api/waitlists/${waitlistId}/customization`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(options),
+        });
+      } catch (error) {
+        console.error("Failed to save customization:", error);
+        toast.error("Failed to save customization");
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    // Debounce the save operation
+    const timeoutId = setTimeout(saveCustomization, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [options, waitlistId]);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  const generateEmbedUrl = () => {
-    const params = new URLSearchParams();
-    Object.entries(options).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.set(key, String(value));
-      }
-    });
-    return `${baseUrl}/embed/${waitlistSlug}?${params.toString()}`;
-  };
-
-  const generateEmbedCode = () => {
-    const embedUrl = generateEmbedUrl();
-    const { width, height } = deviceSizes[previewDevice];
-
-    if (options.embedType === "iframe") {
-      return `<iframe src="${embedUrl}" width="${width}" height="${height}" frameborder="0" style="border: none; border-radius: ${options.borderRadius}px; box-shadow: 0 ${options.shadowIntensity * 2}px ${options.shadowIntensity * 8}px rgba(0,0,0,0.1);"></iframe>`;
-    }
-
-    return `<div id="waitlist-embed-${waitlistSlug}"></div>
-<script>
-  (function() {
-    var iframe = document.createElement('iframe');
-    iframe.src = '${embedUrl}';
-    iframe.width = '${width}';
-    iframe.height = '${height}';
-    iframe.frameBorder = '0';
-    iframe.style.border = 'none';
-    iframe.style.borderRadius = '${options.borderRadius}px';
-    iframe.style.boxShadow = '0 ${options.shadowIntensity * 2}px ${options.shadowIntensity * 8}px rgba(0,0,0,0.1)';
-    document.getElementById('waitlist-embed-${waitlistSlug}').appendChild(iframe);
-  })();
-</script>`;
+  const generateSimpleEmbedCode = () => {
+    return `<div id="waitlist-widget-${waitlistSlug}" data-waitlist-slug="${waitlistSlug}"></div>
+<script src="${baseUrl}/api/widget/script"></script>`;
   };
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(generateEmbedCode());
+      await navigator.clipboard.writeText(generateSimpleEmbedCode());
       setCopied(true);
       toast.success("Embed code copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
@@ -891,15 +913,27 @@ export function WaitlistCustomizer({
               <Code2 className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm font-medium truncate">Embed Code</span>
               <Badge variant="outline" className="text-xs flex-shrink-0">
-                {options.embedType}
+                Simple
               </Badge>
+              {isSaving && (
+                <Badge variant="secondary" className="text-xs flex-shrink-0">
+                  Saving...
+                </Badge>
+              )}
             </div>
           </div>
 
           <div className="bg-slate-900 text-slate-100 p-3 md:p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto w-full">
             <code className="whitespace-pre-wrap break-all">
-              {generateEmbedCode()}
+              {generateSimpleEmbedCode()}
             </code>
+          </div>
+
+          <div className="mt-3 text-xs text-muted-foreground">
+            <p>
+              ✨ Styles automatically update when you change settings - no need
+              to regenerate the embed code!
+            </p>
           </div>
         </motion.div>
       </div>

@@ -3,11 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   name: z.string().optional(),
   referredBy: z.string().optional(),
 });
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
 
 export async function POST(
   request: Request,
@@ -22,7 +32,7 @@ export async function POST(
           success: false,
           message: "Waitlist slug is required",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -36,7 +46,7 @@ export async function POST(
           success: false,
           message: "Waitlist not found",
         },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -49,12 +59,13 @@ export async function POST(
           success: false,
           message: validation.error.errors[0]?.message || "Invalid form data",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     const { email, name, referredBy } = validation.data;
 
+    // Check if email already exists for this waitlist
     const existingSignup = await prisma.signup.findFirst({
       where: {
         email,
@@ -63,84 +74,58 @@ export async function POST(
     });
 
     if (existingSignup) {
-      return NextResponse.json({
-        success: false,
-        message: "You're already on this waitlist!",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "This email is already on the waitlist",
+        },
+        { status: 409, headers: corsHeaders }
+      );
     }
 
+    // Generate unique referral ID
     const referralId = nanoid(8);
 
-    // Create the new signup
-    const newSignup = await prisma.signup.create({
+    // Create signup
+    const signup = await prisma.signup.create({
       data: {
         email,
-        name: name || null,
-        waitlistId: waitlist.id,
-        ...(referredBy ? { referredBy } : {}),
+        name,
         referralId,
-      },
-    });
-
-    // If there's a referrer, increment their referral count
-    if (referredBy) {
-      try {
-        // Find the referrer's signup
-        const referrerSignup = await prisma.signup.findFirst({
-          where: {
-            referralId: referredBy,
-            waitlistId: waitlist.id,
-          },
-        });
-
-        // If referrer exists, update their referral count in a separate field
-        // (This would require a schema modification, but we're handling the count logic here)
-        if (referrerSignup) {
-          // Count how many people this user has referred
-          const referralsCount = await prisma.signup.count({
-            where: {
-              referredBy: referredBy,
-              waitlistId: waitlist.id,
-            },
-          });
-
-          console.log(
-            `User with referralId ${referredBy} has referred ${referralsCount} people`
-          );
-        }
-      } catch (referralError) {
-        // Log but don't fail if referral processing has issues
-        console.error("Error processing referral:", referralError);
-      }
-    }
-
-    // Calculate user's position in the waitlist
-    const signupsBeforeUser = await prisma.signup.count({
-      where: {
-        waitlistId: waitlist.id,
-        createdAt: {
-          lt: newSignup.createdAt,
+        referredBy,
+        waitlist: {
+          connect: { id: waitlist.id },
         },
       },
     });
 
-    // Position is 1-based (first person is #1)
-    const position = signupsBeforeUser + 1;
-
-    return NextResponse.json({
-      success: true,
-      message: "Successfully joined the waitlist!",
-      referralId,
-      position,
+    // Get position on waitlist
+    const position = await prisma.signup.count({
+      where: {
+        waitlistId: waitlist.id,
+        createdAt: {
+          lte: signup.createdAt,
+        },
+      },
     });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Successfully joined the waitlist!",
+        position,
+        referralId: signup.referralId,
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error("Error creating signup:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to join waitlist. Please try again.",
+        message: "An unexpected error occurred. Please try again.",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

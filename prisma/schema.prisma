@@ -30,13 +30,14 @@ model User {
 }
 
 model Waitlist {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id])
-  signups   Signup[]
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  ownerId       String
+  owner         User     @relation(fields: [ownerId], references: [id])
+  signups       Signup[]
+  createdAt     DateTime @default(now())
+  customization Json?
 }
 
 model Signup {

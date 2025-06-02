@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,9 +41,6 @@ interface CustomizationOptions {
 
 interface EmbeddableWaitlistFormProps {
   waitlistSlug: string;
-  waitlistName: string;
-  signupCount: number;
-  customization: CustomizationOptions;
 }
 
 type FormState = {
@@ -80,16 +77,47 @@ const animationVariants = {
 
 export function EmbeddableWaitlistForm({
   waitlistSlug,
-  waitlistName,
-  signupCount,
-  customization,
 }: EmbeddableWaitlistFormProps) {
+  const [config, setConfig] = useState<{
+    waitlist: {
+      id: string;
+      name: string;
+      slug: string;
+      signupCount: number;
+    };
+    customization: CustomizationOptions;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [formState, setFormState] = useState<FormState>({
     isSubmitting: false,
     result: null,
   });
 
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const response = await fetch(`/api/widget/${waitlistSlug}/config`);
+        if (!response.ok) {
+          throw new Error("Failed to load waitlist configuration");
+        }
+        const data = await response.json();
+        setConfig(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load waitlist"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadConfig();
+  }, [waitlistSlug]);
+
   async function handleSubmit(formData: FormData) {
+    if (!config) return;
+
     setFormState((prev) => ({ ...prev, isSubmitting: true, result: null }));
 
     try {
@@ -116,6 +144,28 @@ export function EmbeddableWaitlistForm({
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+          <p className="text-sm text-red-600">
+            {error || "Failed to load waitlist"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const { waitlist, customization } = config;
   const { isSubmitting, result } = formState;
   const animation = animationVariants[customization.animation];
 
@@ -222,11 +272,11 @@ export function EmbeddableWaitlistForm({
                 className="text-lg"
                 style={{ color: customization.textColor }}
               >
-                {customization.headerText || waitlistName}
+                {customization.headerText || waitlist.name}
               </CardTitle>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>{signupCount.toLocaleString()} joined</span>
+                <span>{waitlist.signupCount.toLocaleString()} joined</span>
               </div>
             </div>
           </div>

@@ -1,8 +1,7 @@
 import { getWaitlistOverview } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { Badge } from "@/components/ui/badge";
-import { Settings } from "lucide-react";
+
 import { WaitlistCustomizer } from "@/components/waitlist-customizer";
 
 interface WaitlistSettingsPageProps {
@@ -27,7 +26,7 @@ export default async function WaitlistSettingsPage({
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
-      <div className="p-4 md:p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
+      {/* <div className="p-4 md:p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
         <div className="flex items-center gap-3 mb-2">
           <Settings className="w-6 h-6 md:w-8 md:h-8 text-primary" />
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -45,7 +44,7 @@ export default async function WaitlistSettingsPage({
             /{waitlistData.slug}
           </span>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex-1 overflow-hidden min-w-0">
         <WaitlistCustomizer
