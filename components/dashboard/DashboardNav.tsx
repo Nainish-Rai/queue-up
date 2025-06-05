@@ -167,7 +167,7 @@ function WaitlistItem({
                 <span>No-Code Builder</span>
               </Link>
               <Link
-                href={`/dashboard/${waitlist.id}`}
+                href={`/dashboard/${waitlist.id}/analytics`}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:scale-105 ${
                   pathname === `/dashboard/${waitlist.id}/analytics`
                     ? "bg-primary/10 text-primary border border-primary/20"

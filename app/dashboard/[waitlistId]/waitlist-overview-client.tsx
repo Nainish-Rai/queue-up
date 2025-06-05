@@ -209,21 +209,15 @@ export function WaitlistOverviewClient({
         <Card className="relative overflow-hidden">
           <motion.div
             className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 opacity-5"
-            initial={{ scale: 0, rotate: 45 }}
+            initial={{ scale: 0, rotate: 0 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            transition={{ duration: 0.2, ease: "easeOut", delay: 0.2 }}
           />
           <CardHeader>
             <CardTitle>All Signups</CardTitle>
           </CardHeader>
-          <CardContent>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <SignupsTable signups={waitlistData.signups} />
-            </motion.div>
+          <CardContent className="z-20">
+            <SignupsTable signups={waitlistData.signups} />
           </CardContent>
         </Card>
       </motion.div>
