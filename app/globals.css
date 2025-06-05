@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+nextjs-portal {
+  display: none;
+}
 .times {
   font-family: "Times New Roman", Times, serif;
   font-style: italic;
